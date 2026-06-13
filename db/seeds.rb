@@ -1,6 +1,6 @@
 def create_user(tenant, email, token)
   user = User.find_or_create_by!(tenant: tenant, email: email)
-  ApiToken.find_or_create_by!(user: user, token_digest: Digest::SHA256.hexdigest(token))
+  ApiToken.find_or_create_by!(user: user, token_digest: ApiToken.digest(token))
 end
 
 # First tenant seeds

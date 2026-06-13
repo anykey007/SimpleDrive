@@ -2,8 +2,8 @@
 
 one:
   user: one
-  token_digest: token-digest-one
+  token_digest: <%= ApiToken.digest("6d4769052b644be4c3f96ee67faa4bbb8ab8aa8be46055f2cea1e513cec22d52") %>
 
 two:
   user: two
-  token_digest: token-digest-two
+  token_digest: <%= ApiToken.digest("93367a826d78632eb54957f467e10fa0628213e2c1896fb0c37338f7fb9f4c26") %>
