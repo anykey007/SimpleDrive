@@ -1,8 +1,9 @@
 one:
   tenant: one
   name: Primary
-  adapter_type: local
-  configuration: {}
+  adapter_type: filesystem
+  configuration:
+    storage_path: "test_storage/one"
   active: true
 
 two:
