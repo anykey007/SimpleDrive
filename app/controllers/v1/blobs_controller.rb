@@ -25,10 +25,7 @@ module V1
       )
 
       if blob.valid?
-        adapter = Storage::Filesystem.new(
-          storage_path: storage_provider.configuration["storage_path"],
-          storage_key: blob.storage_key
-        )
+        adapter = Storage::Factory.build(storage_provider, storage_key: blob.storage_key)
         adapter.store(io: StringIO.new(decoded_data))
 
         blob.save!
