@@ -12,4 +12,9 @@ two:
   adapter_type: s3
   configuration:
     bucket: simple-drive-test
+    endpoint: http://localhost:9000
+    access_key_id: minio
+    secret_access_key: minio123456
+    force_path_style: true
+    region: us-east-1
   active: true

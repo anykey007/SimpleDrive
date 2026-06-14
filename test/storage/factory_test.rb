@@ -25,6 +25,44 @@ class Storage::FactoryTest < ActiveSupport::TestCase
     assert_equal "storage/symbol_path", adapter.instance_variable_get(:@storage_path)
   end
 
+  test "builds an s3 adapter successfully with valid storage provider" do
+    provider = StorageProvider.new(
+      adapter_type: "s3",
+      configuration: {
+        "bucket" => "my-s3-bucket",
+        "endpoint" => "http://localhost:9000",
+        "access_key_id" => "minio",
+        "secret_access_key" => "minio123456",
+        "region" => "us-east-1",
+        "force_path_style" => true
+      }
+    )
+
+    adapter = Storage::Factory.build(provider, storage_key: "s3key")
+    assert_instance_of Storage::S3, adapter
+    assert_equal "my-s3-bucket", adapter.bucket_name
+    assert_equal "s3key", adapter.storage_key
+  end
+
+  test "builds s3 adapter with symbol-keyed configurations" do
+    provider = StorageProvider.new(
+      adapter_type: "s3",
+      configuration: {
+        bucket: "my-s3-bucket-symbol",
+        endpoint: "http://localhost:9000",
+        access_key_id: "minio",
+        secret_access_key: "minio123456",
+        region: "us-east-1",
+        force_path_style: true
+      }
+    )
+
+    adapter = Storage::Factory.build(provider, storage_key: "s3key")
+    assert_instance_of Storage::S3, adapter
+    assert_equal "my-s3-bucket-symbol", adapter.bucket_name
+    assert_equal "s3key", adapter.storage_key
+  end
+
   test "raises ArgumentError when storage provider is nil" do
     error = assert_raises(ArgumentError) do
       Storage::Factory.build(nil)

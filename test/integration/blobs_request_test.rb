@@ -4,6 +4,7 @@ require "fileutils"
 
 class BlobsRequestTest < ActionDispatch::IntegrationTest
   setup do
+    @created_files = []
     @valid_params = {
       id: "any_valid_string_or_identifier",
       data: Base64.strict_encode64("Hello Simple Storage World!")
@@ -11,7 +12,7 @@ class BlobsRequestTest < ActionDispatch::IntegrationTest
   end
 
   teardown do
-    FileUtils.rm_rf(Rails.root.join("test_storage/one"))
+    @created_files.each { |path| FileUtils.rm_f(path) }
   end
 
   test "accepts request with valid bearer token and base64 data" do
@@ -21,6 +22,7 @@ class BlobsRequestTest < ActionDispatch::IntegrationTest
       as: :json
 
     assert_response :no_content
+    track_created_blob_file
   end
 
   test "successfully saves blob record and stores file in the filesystem" do
@@ -47,8 +49,29 @@ class BlobsRequestTest < ActionDispatch::IntegrationTest
       blob.storage_key
     )
 
+    @created_files << expected_file_path
+
     assert_path_exists expected_file_path
     assert_equal "Hello Simple Storage World!", File.binread(expected_file_path)
+  end
+
+  test "successfully saves blob record and stores file in S3" do
+    assert_difference -> { Blob.count }, 1 do
+      post "/v1/blobs",
+        params: @valid_params,
+        headers: { "Authorization" => "Bearer 93367a826d78632eb54957f467e10fa0628213e2c1896fb0c37338f7fb9f4c26" },
+        as: :json
+    end
+
+    assert_response :no_content
+
+    blob = Blob.last
+    assert_equal @valid_params[:id], blob.external_id
+    assert_equal users(:two), blob.user
+
+    expected_provider = api_tokens(:two).user.tenant.storage_providers.active.first
+    assert_equal expected_provider, blob.storage_provider
+    assert_equal "s3", expected_provider.adapter_type
   end
 
   test "returns unprocessable entity when no active storage provider exists" do
@@ -113,6 +136,22 @@ class BlobsRequestTest < ActionDispatch::IntegrationTest
   end
 
   private
+
+  def track_created_blob_file
+    blob = Blob.last
+    return unless blob
+
+    provider = blob.storage_provider
+    if provider.adapter_type == "filesystem"
+      file_path = Rails.root.join(
+        provider.configuration["storage_path"],
+        blob.storage_key[0, 2],
+        blob.storage_key[2, 2],
+        blob.storage_key
+      )
+      @created_files << file_path
+    end
+  end
 
   def auth_headers
     { "Authorization" => "Bearer 6d4769052b644be4c3f96ee67faa4bbb8ab8aa8be46055f2cea1e513cec22d52" }

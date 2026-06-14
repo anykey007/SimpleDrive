@@ -12,6 +12,17 @@ module Storage
           storage_path: storage_path,
           storage_key: storage_key
         )
+      when "s3"
+        config = storage_provider.configuration || {}
+        Storage::S3.new(
+          bucket: config["bucket"] || config[:bucket],
+          access_key_id: config["access_key_id"] || config[:access_key_id],
+          secret_access_key: config["secret_access_key"] || config[:secret_access_key],
+          endpoint: config["endpoint"] || config[:endpoint],
+          region: config["region"] || config[:region],
+          force_path_style: config["force_path_style"].nil? ? config[:force_path_style] : config["force_path_style"],
+          storage_key: storage_key
+        )
       else
         raise ArgumentError, "Unknown storage provider adapter type: #{storage_provider.adapter_type}"
       end
