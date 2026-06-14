@@ -37,6 +37,41 @@ module V1
       render json: { error: "data must be a valid Base64 encoded string" }, status: :unprocessable_entity
     end
 
+    def show
+      external_id = params[:id]
+      blob = @api_token.user.blobs.find_by(external_id: external_id)
+
+      if blob.nil? && !external_id.start_with?("/")
+        blob = @api_token.user.blobs.find_by(external_id: "/" + external_id)
+      end
+
+      if blob.nil?
+        render json: { error: "Blob not found" }, status: :not_found
+        return
+      end
+
+      storage_provider = blob.storage_provider
+      adapter = Storage::Factory.build(storage_provider, storage_key: blob.storage_key)
+
+      begin
+        io = adapter.retrieve
+        begin
+          data = io.read
+        ensure
+          io.close if io.respond_to?(:close)
+        end
+
+        render json: {
+          id: blob.external_id,
+          data: Base64.strict_encode64(data),
+          size: blob.size_bytes.to_s,
+          created_at: blob.created_at.utc.iso8601
+        }, status: :ok
+      rescue => e
+        render json: { error: "Failed to retrieve storage data: #{e.message}" }, status: :internal_server_error
+      end
+    end
+
     private
 
     def authenticate_user!

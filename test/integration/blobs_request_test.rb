@@ -142,6 +142,103 @@ class BlobsRequestTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
+  test "GET /v1/blobs/:id retrieves blob from filesystem successfully" do
+    post "/v1/blobs",
+      params: @valid_params,
+      headers: auth_headers,
+      as: :json
+    assert_response :no_content
+    track_created_blob_file
+
+    get "/v1/blobs/#{@valid_params[:id]}",
+      headers: auth_headers
+
+    assert_response :success
+    json_response = JSON.parse(response.body)
+    assert_equal @valid_params[:id], json_response["id"]
+    assert_equal @valid_params[:data], json_response["data"]
+    assert_equal "27", json_response["size"]
+    assert_match(/\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z\z/, json_response["created_at"])
+  end
+
+  test "GET /v1/blobs/:id retrieves blob from S3 successfully" do
+    post "/v1/blobs",
+      params: @valid_params,
+      headers: { "Authorization" => "Bearer 93367a826d78632eb54957f467e10fa0628213e2c1896fb0c37338f7fb9f4c26" },
+      as: :json
+    assert_response :no_content
+
+    get "/v1/blobs/#{@valid_params[:id]}",
+      headers: { "Authorization" => "Bearer 93367a826d78632eb54957f467e10fa0628213e2c1896fb0c37338f7fb9f4c26" }
+
+    assert_response :success
+    json_response = JSON.parse(response.body)
+    assert_equal @valid_params[:id], json_response["id"]
+    assert_equal @valid_params[:data], json_response["data"]
+    assert_equal "27", json_response["size"]
+    assert_match(/\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z\z/, json_response["created_at"])
+  end
+
+  test "GET /v1/blobs/:id with a path containing slashes retrieves blob successfully" do
+    path_id = "/dir1/dir2/CV.pdf"
+    params = {
+      id: path_id,
+      data: Base64.strict_encode64("Hello Simple Storage World!")
+    }
+
+    post "/v1/blobs",
+      params: params,
+      headers: auth_headers,
+      as: :json
+    assert_response :no_content
+    track_created_blob_file
+
+    get "/v1/blobs/dir1/dir2/CV.pdf",
+      headers: auth_headers
+
+    assert_response :success
+    json_response = JSON.parse(response.body)
+    assert_equal path_id, json_response["id"]
+    assert_equal params[:data], json_response["data"]
+    assert_equal "27", json_response["size"]
+
+    get "/v1/blobs//dir1/dir2/CV.pdf",
+      headers: auth_headers
+    assert_response :success
+  end
+
+  test "GET /v1/blobs/:id returns 404 if blob not found" do
+    get "/v1/blobs/non_existent_id",
+      headers: auth_headers
+
+    assert_response :not_found
+    json_response = JSON.parse(response.body)
+    assert_equal "Blob not found", json_response["error"]
+  end
+
+  test "GET /v1/blobs/:id returns 401 if unauthorized" do
+    get "/v1/blobs/some_id"
+    assert_response :unauthorized
+
+    get "/v1/blobs/some_id",
+      headers: { "Authorization" => "Bearer invalid-token" }
+    assert_response :unauthorized
+  end
+
+  test "GET /v1/blobs/:id does not allow a user to access other user's blobs" do
+    post "/v1/blobs",
+      params: @valid_params,
+      headers: auth_headers,
+      as: :json
+    assert_response :no_content
+    track_created_blob_file
+
+    get "/v1/blobs/#{@valid_params[:id]}",
+      headers: { "Authorization" => "Bearer 93367a826d78632eb54957f467e10fa0628213e2c1896fb0c37338f7fb9f4c26" }
+
+    assert_response :not_found
+  end
+
   private
 
   def track_created_blob_file
