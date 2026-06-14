@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_14_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_14_001000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -21,6 +21,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_14_000000) do
     t.bigint "user_id", null: false
     t.index ["token_digest"], name: "index_api_tokens_on_token_digest", unique: true
     t.index ["user_id"], name: "index_api_tokens_on_user_id"
+  end
+
+  create_table "blobs", force: :cascade do |t|
+    t.string "checksum_sha256", null: false
+    t.datetime "created_at", null: false
+    t.string "external_id", null: false
+    t.bigint "size_bytes", null: false
+    t.string "storage_key", null: false
+    t.bigint "storage_provider_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["storage_key"], name: "index_blobs_on_storage_key", unique: true
+    t.index ["storage_provider_id"], name: "index_blobs_on_storage_provider_id"
+    t.index ["user_id", "external_id"], name: "index_blobs_on_user_id_and_external_id", unique: true
+    t.index ["user_id"], name: "index_blobs_on_user_id"
   end
 
   create_table "storage_providers", force: :cascade do |t|
@@ -51,6 +66,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_14_000000) do
   end
 
   add_foreign_key "api_tokens", "users"
+  add_foreign_key "blobs", "storage_providers"
+  add_foreign_key "blobs", "users"
   add_foreign_key "storage_providers", "tenants"
   add_foreign_key "users", "tenants"
 end
