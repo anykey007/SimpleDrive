@@ -25,3 +25,4 @@
 /config/*.key
 
 docker-compose.yml
+.idea/
