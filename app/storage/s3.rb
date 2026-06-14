@@ -4,15 +4,16 @@ module Storage
   class S3 < Base
     attr_reader :bucket_name, :storage_key
 
-    def initialize(bucket:, access_key_id:, secret_access_key:, endpoint:, region:, force_path_style:, storage_key:)
+    def initialize(bucket: nil, access_key_id: nil, secret_access_key: nil, endpoint: nil, region: "us-east-1", force_path_style: true, storage_key: nil)
       @bucket_name = bucket
       @storage_key = storage_key
-      @client_options = { }
+      @client_options = {
+        region: region || "us-east-1",
+        force_path_style: force_path_style.nil? ? true : force_path_style
+      }
       @client_options[:access_key_id] = access_key_id if access_key_id
       @client_options[:secret_access_key] = secret_access_key if secret_access_key
       @client_options[:endpoint] = endpoint if endpoint
-      @client_options[:force_path_style] = force_path_style if force_path_style
-      @client_options[:region] = region if region
     end
 
     def client

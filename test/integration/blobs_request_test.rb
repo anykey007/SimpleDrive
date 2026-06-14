@@ -72,6 +72,13 @@ class BlobsRequestTest < ActionDispatch::IntegrationTest
     expected_provider = api_tokens(:two).user.tenant.storage_providers.active.first
     assert_equal expected_provider, blob.storage_provider
     assert_equal "s3", expected_provider.adapter_type
+
+    # Verify we can retrieve the stored content from the real S3 bucket
+    adapter = Storage::Factory.build(expected_provider, storage_key: blob.storage_key)
+    retrieved = adapter.retrieve
+    assert_equal "Hello Simple Storage World!", retrieved.read
+  ensure
+    retrieved&.close
   end
 
   test "returns unprocessable entity when no active storage provider exists" do

@@ -11,7 +11,7 @@ two:
   name: Secondary
   adapter_type: s3
   configuration:
-    bucket: simple-drive-test
+    bucket: test-s3-bucket
     endpoint: http://localhost:9000
     access_key_id: minio
     secret_access_key: minio123456
