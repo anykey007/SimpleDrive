@@ -1,0 +1,14 @@
+one:
+  tenant: one
+  name: Primary
+  adapter_type: local
+  configuration: {}
+  active: true
+
+two:
+  tenant: two
+  name: Secondary
+  adapter_type: s3
+  configuration:
+    bucket: simple-drive-test
+  active: true
