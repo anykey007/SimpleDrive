@@ -18,3 +18,10 @@ two:
     force_path_style: true
     region: us-east-1
   active: true
+
+three:
+  tenant: three
+  name: Database Storage
+  adapter_type: database
+  configuration: {}
+  active: true

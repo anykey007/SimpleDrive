@@ -7,3 +7,7 @@ one:
 two:
   tenant: two
   email: bob@globex.test
+
+three:
+  tenant: three
+  email: sarah@cyberdyne.test

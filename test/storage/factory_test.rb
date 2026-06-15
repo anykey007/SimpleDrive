@@ -63,6 +63,14 @@ class Storage::FactoryTest < ActiveSupport::TestCase
     assert_equal "s3key", adapter.storage_key
   end
 
+  test "builds a database adapter successfully with valid storage provider" do
+    provider = storage_providers(:three)
+
+    adapter = Storage::Factory.build(provider, storage_key: "dbkey")
+    assert_instance_of Storage::Database, adapter
+    assert_equal "dbkey", adapter.instance_variable_get(:@storage_key)
+  end
+
   test "raises ArgumentError when storage provider is nil" do
     error = assert_raises(ArgumentError) do
       Storage::Factory.build(nil)

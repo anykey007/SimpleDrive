@@ -9,6 +9,7 @@ class BlobsRequestTest < ActionDispatch::IntegrationTest
       id: "any_valid_string_or_identifier",
       data: Base64.strict_encode64("Hello Simple Storage World!")
     }
+    BlobDataObject.delete_all
   end
 
   teardown do
@@ -79,6 +80,40 @@ class BlobsRequestTest < ActionDispatch::IntegrationTest
     assert_equal "Hello Simple Storage World!", retrieved.read
   ensure
     retrieved&.close
+  end
+
+  test "successfully saves blob record and stores file in the database" do
+    provider = storage_providers(:three)
+    db_headers = { "Authorization" => "Bearer d88214fa3ca59d332d78632eb54957f467e10fa0628213e2c1896fb0c37338ff" }
+
+    assert_difference -> { Blob.count }, 1 do
+      post "/v1/blobs",
+        params: @valid_params,
+        headers: db_headers,
+        as: :json
+    end
+
+    assert_response :no_content
+
+    blob = Blob.last
+    assert_equal @valid_params[:id], blob.external_id
+    assert_equal users(:three), blob.user
+    assert_equal provider, blob.storage_provider
+
+    # Verify that the blob content is stored in the database's blob_data_objects table
+    db_object = BlobDataObject.find_by(storage_key: blob.storage_key)
+    assert_not_nil db_object
+    assert_equal "Hello Simple Storage World!", db_object.data
+
+    # Now verify GET /v1/blobs/:id retrieves the database blob successfully
+    get "/v1/blobs/#{@valid_params[:id]}",
+      headers: db_headers
+
+    assert_response :success
+    json_response = JSON.parse(response.body)
+    assert_equal @valid_params[:id], json_response["id"]
+    assert_equal @valid_params[:data], json_response["data"]
+    assert_equal "27", json_response["size"]
   end
 
   test "returns unprocessable entity when no active storage provider exists" do

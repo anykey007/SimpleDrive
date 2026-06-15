@@ -38,3 +38,15 @@ StorageProvider.find_or_create_by!(
 
 create_user(tenant, "jim@globex.test", "e572fbc29acf3a627f1dd8ac876de2a54d120febb2b7a3c4fd7cc1f6e49837f7")
 create_user(tenant, "bob@globex.test", "303087315e1733f1336aa8ce0098d7852b7f880b2d1e8ae29961dead7ea1c07e")
+
+# Third tenant seeds
+tenant = Tenant.find_or_create_by!(name: "Cyberdyne")
+StorageProvider.find_or_create_by!(
+  tenant: tenant,
+  name: "Database Storage",
+  adapter_type: "database",
+  configuration: {},
+  active: true
+)
+
+create_user(tenant, "sarah@cyberdyne.test", "d88214fa3ca59d332d78632eb54957f467e10fa0628213e2c1896fb0c37338ff")

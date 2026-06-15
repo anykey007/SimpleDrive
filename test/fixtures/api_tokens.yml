@@ -7,3 +7,7 @@ one:
 two:
   user: two
   token_digest: <%= ApiToken.digest("93367a826d78632eb54957f467e10fa0628213e2c1896fb0c37338f7fb9f4c26") %>
+
+three:
+  user: three
+  token_digest: <%= ApiToken.digest("d88214fa3ca59d332d78632eb54957f467e10fa0628213e2c1896fb0c37338ff") %>

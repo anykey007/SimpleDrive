@@ -23,6 +23,10 @@ module Storage
           force_path_style: config["force_path_style"].nil? ? config[:force_path_style] : config["force_path_style"],
           storage_key: storage_key
         )
+      when "database"
+        Storage::Database.new(
+          storage_key: storage_key
+        )
       else
         raise ArgumentError, "Unknown storage provider adapter type: #{storage_provider.adapter_type}"
       end
