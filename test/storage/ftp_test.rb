@@ -69,13 +69,13 @@ class Storage::FtpTest < ActiveSupport::TestCase
     assert_equal ["host", "password", "port", "root_path", "username"], error.missing_keys
   end
 
-  test "raises Errno::ENOENT on retrieve if file is not found on FTP" do
+  test "raises Storage::FileNotFoundError on retrieve if file is not found on FTP" do
     storage = Storage::Ftp.new(
       options: @provider.configuration,
       storage_key: "nonexistent_key_here_1234"
     )
 
-    assert_raises(Errno::ENOENT) do
+    assert_raises(Storage::FileNotFoundError) do
       storage.retrieve
     end
   end

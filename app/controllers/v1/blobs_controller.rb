@@ -67,6 +67,8 @@ module V1
           size: blob.size_bytes.to_s,
           created_at: blob.created_at.utc.iso8601
         }, status: :ok
+      rescue Storage::FileNotFoundError => e
+        render json: { error: "File content is missing on storage server: #{e.message}" }, status: :not_found
       rescue => e
         render json: { error: "Failed to retrieve storage data: #{e.message}" }, status: :internal_server_error
       end

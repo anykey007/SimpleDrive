@@ -54,10 +54,10 @@ class Storage::DatabaseTest < ActiveSupport::TestCase
     end
   end
 
-  test "raises ActiveRecord::RecordNotFound when key is not found on retrieve" do
+  test "raises Storage::FileNotFoundError when key is not found on retrieve" do
     storage = Storage::Database.new(storage_key: "non-existent-key")
 
-    assert_raises(ActiveRecord::RecordNotFound) do
+    assert_raises(Storage::FileNotFoundError) do
       storage.retrieve
     end
   end

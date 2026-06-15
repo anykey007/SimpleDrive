@@ -50,6 +50,13 @@ class Storage::FilesystemTest < ActiveSupport::TestCase
   ensure
     retrieved&.close
   end
+
+  test "raises Storage::FileNotFoundError when file does not exist on retrieve" do
+    @storage = Storage::Filesystem.new(options: { storage_path: @storage_path }, storage_key: "missing-key")
+    assert_raises(Storage::FileNotFoundError) do
+      @storage.retrieve
+    end
+  end
 end
 
 class Storage::FilesystemInitializationTest < ActiveSupport::TestCase

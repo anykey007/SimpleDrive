@@ -26,6 +26,12 @@ module Storage
     def retrieve
       response = client.get_object(storage_key)
       StringIO.new(response.body)
+    rescue => e
+      if e.message.include?("code 404")
+        raise Storage::FileNotFoundError.new(storage_key, "Object not found in S3 bucket", e)
+      else
+        raise e
+      end
     end
   end
 end

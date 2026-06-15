@@ -38,4 +38,17 @@ class Storage::S3Test < ActiveSupport::TestCase
   ensure
     retrieved&.close
   end
+
+  test "raises Storage::FileNotFoundError when retrieving non-existent file from S3" do
+    config = storage_providers(:two).configuration
+
+    storage = Storage::S3.new(
+      options: config,
+      storage_key: "non_existent_s3_key_12345"
+    )
+
+    assert_raises(Storage::FileNotFoundError) do
+      storage.retrieve
+    end
+  end
 end

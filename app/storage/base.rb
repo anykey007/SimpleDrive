@@ -1,6 +1,16 @@
 module Storage
   class Error < StandardError; end
 
+  class FileNotFoundError < Error
+    attr_reader :storage_key, :original_exception
+
+    def initialize(storage_key, message = "File not found in storage", original_exception = nil)
+      @storage_key = storage_key
+      @original_exception = original_exception
+      super("#{message} (key: #{storage_key})")
+    end
+  end
+
   class ConfigurationError < Error
     attr_reader :adapter_class, :missing_keys
 

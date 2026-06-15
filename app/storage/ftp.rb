@@ -35,7 +35,7 @@ module Storage
     rescue Net::FTPPermError => e
       raise unless e.message.start_with?("550")
 
-      raise Errno::ENOENT, path
+      raise Storage::FileNotFoundError.new(storage_key, "File not found on FTP server", e)
     end
 
     private

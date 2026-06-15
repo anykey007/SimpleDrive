@@ -17,6 +17,8 @@ module Storage
 
     def retrieve
       File.open(file_path, "rb")
+    rescue Errno::ENOENT => e
+      raise Storage::FileNotFoundError.new(storage_key, "File not found on local filesystem", e)
     end
 
     private

@@ -251,6 +251,35 @@ class BlobsRequestTest < ActionDispatch::IntegrationTest
     assert_equal "Blob not found", json_response["error"]
   end
 
+  test "GET /v1/blobs/:id returns 404 with custom error if blob exists but storage file is missing" do
+    # Create a blob record
+    post "/v1/blobs",
+      params: @valid_params,
+      headers: auth_headers,
+      as: :json
+    assert_response :no_content
+
+    # Locate the file on disk and delete it
+    blob = Blob.find_by!(external_id: @valid_params[:id])
+    provider = blob.storage_provider
+    file_path = Rails.root.join(
+      provider.configuration["storage_path"],
+      blob.storage_key[0, 2],
+      blob.storage_key[2, 2],
+      blob.storage_key
+    )
+    assert_path_exists file_path
+    FileUtils.rm(file_path)
+
+    # Now retrieve the blob, it should return 404 Not Found instead of 500
+    get "/v1/blobs/#{@valid_params[:id]}",
+      headers: auth_headers
+
+    assert_response :not_found
+    json_response = JSON.parse(response.body)
+    assert_includes json_response["error"], "File content is missing on storage server"
+  end
+
   test "GET /v1/blobs/:id returns 401 if unauthorized" do
     get "/v1/blobs/some_id"
     assert_response :unauthorized
