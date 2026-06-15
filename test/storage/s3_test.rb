@@ -19,7 +19,7 @@ class Storage::S3Test < ActiveSupport::TestCase
   end
 
   test "stores file content to s3" do
-    config = storage_providers(:two).configuration
+    config = storage_providers(:globex_s3).configuration
 
     storage = Storage::S3.new(
       options: config,
@@ -40,7 +40,7 @@ class Storage::S3Test < ActiveSupport::TestCase
   end
 
   test "raises Storage::ReadDataError when retrieving non-existent file from S3" do
-    config = storage_providers(:two).configuration
+    config = storage_providers(:globex_s3).configuration
 
     storage = Storage::S3.new(
       options: config,
@@ -53,7 +53,7 @@ class Storage::S3Test < ActiveSupport::TestCase
   end
 
   test "raises Storage::WriteDataError when writing to S3 fails" do
-    config = storage_providers(:two).configuration
+    config = storage_providers(:globex_s3).configuration
     storage = Storage::S3.new(options: config, storage_key: @storage_key)
 
     storage.client.stub(:put_object, ->(*args) { raise StandardError, "Network error" }) do

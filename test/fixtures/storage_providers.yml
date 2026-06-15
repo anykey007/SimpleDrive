@@ -1,13 +1,13 @@
-one:
-  tenant: one
+acme_filesystem:
+  tenant: acme
   name: Primary
   adapter_type: filesystem
   configuration:
-    storage_path: "test_storage/one"
+    storage_path: "test_storage/acme"
   active: true
 
-two:
-  tenant: two
+globex_s3:
+  tenant: globex
   name: Secondary
   adapter_type: s3
   configuration:
@@ -19,15 +19,15 @@ two:
     region: us-east-1
   active: true
 
-three:
-  tenant: three
+cyberdyne_database:
+  tenant: cyberdyne
   name: Database Storage
   adapter_type: database
   configuration: {}
   active: true
 
-four:
-  tenant: four
+uplink_ftp:
+  tenant: uplink
   name: FTP Storage
   adapter_type: ftp
   configuration:

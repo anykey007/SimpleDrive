@@ -3,7 +3,7 @@ require "stringio"
 
 class Storage::FtpTest < ActiveSupport::TestCase
   setup do
-    @provider = storage_providers(:four)
+    @provider = storage_providers(:uplink_ftp)
     @root_path = @provider.configuration[:root_path]
     @storage_key = "test_ftp_file_key"
   end

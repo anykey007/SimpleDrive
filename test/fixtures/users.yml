@@ -1,17 +1,17 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  tenant: one
+jim:
+  tenant: acme
   email: jim@acme.test
 
-two:
-  tenant: two
+bob:
+  tenant: globex
   email: bob@globex.test
 
-three:
-  tenant: three
+sarah:
+  tenant: cyberdyne
   email: sarah@cyberdyne.test
 
-four:
-  tenant: four
+uplink_user:
+  tenant: uplink
   email: user@uplink.test

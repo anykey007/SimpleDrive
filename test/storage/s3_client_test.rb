@@ -3,7 +3,7 @@ require "stringio"
 
 class S3ClientTest < ActiveSupport::TestCase
   setup do
-    config = storage_providers(:two).configuration
+    config = storage_providers(:globex_s3).configuration
     @client = S3Client.new(
       bucket: config["bucket"],
       access_key_id: config["access_key_id"],

@@ -2,7 +2,7 @@ require "test_helper"
 
 class StorageProviderTest < ActiveSupport::TestCase
   test "valid with tenant, name, adapter type and configuration" do
-    assert storage_providers(:one).valid?
+    assert storage_providers(:acme_filesystem).valid?
   end
 
   test "invalid without a tenant" do
@@ -13,14 +13,14 @@ class StorageProviderTest < ActiveSupport::TestCase
   end
 
   test "invalid without a name" do
-    storage_provider = StorageProvider.new(tenant: tenants(:one), adapter_type: "local", configuration: {})
+    storage_provider = StorageProvider.new(tenant: tenants(:acme), adapter_type: "local", configuration: {})
 
     assert_not storage_provider.valid?
     assert_includes storage_provider.errors[:name], "can't be blank"
   end
 
   test "invalid without an adapter type" do
-    storage_provider = StorageProvider.new(tenant: tenants(:one), name: "Secondary", configuration: {})
+    storage_provider = StorageProvider.new(tenant: tenants(:acme), name: "Secondary", configuration: {})
 
     assert_not storage_provider.valid?
     assert_includes storage_provider.errors[:adapter_type], "can't be blank"
@@ -28,8 +28,8 @@ class StorageProviderTest < ActiveSupport::TestCase
 
   test "invalid with duplicate name in the same tenant" do
     storage_provider = StorageProvider.new(
-      tenant: tenants(:one),
-      name: storage_providers(:one).name,
+      tenant: tenants(:acme),
+      name: storage_providers(:acme_filesystem).name,
       adapter_type: "local",
       configuration: {}
     )
@@ -40,8 +40,8 @@ class StorageProviderTest < ActiveSupport::TestCase
 
   test "valid with duplicate name in another tenant" do
     storage_provider = StorageProvider.new(
-      tenant: tenants(:two),
-      name: storage_providers(:one).name,
+      tenant: tenants(:globex),
+      name: storage_providers(:acme_filesystem).name,
       adapter_type: "local",
       configuration: {}
     )
@@ -50,7 +50,7 @@ class StorageProviderTest < ActiveSupport::TestCase
   end
 
   test "uses default configuration and active values" do
-    storage_provider = StorageProvider.create!(tenant: tenants(:one), name: "Archive", adapter_type: "local")
+    storage_provider = StorageProvider.create!(tenant: tenants(:acme), name: "Archive", adapter_type: "local")
 
     assert_equal({}, storage_provider.configuration)
     assert_equal true, storage_provider.active

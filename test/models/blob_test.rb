@@ -2,7 +2,7 @@ require "test_helper"
 
 class BlobTest < ActiveSupport::TestCase
   test "valid with user, storage provider, external id, storage key, size and checksum" do
-    assert blobs(:one).valid?
+    assert blobs(:readme_blob).valid?
   end
 
   test "invalid without a user" do
@@ -27,14 +27,14 @@ class BlobTest < ActiveSupport::TestCase
   end
 
   test "invalid with duplicate external id for the same user" do
-    blob = build_blob(user: users(:one), external_id: blobs(:one).external_id)
+    blob = build_blob(user: users(:jim), external_id: blobs(:readme_blob).external_id)
 
     assert_not blob.valid?
     assert_includes blob.errors[:external_id], "has already been taken"
   end
 
   test "valid with duplicate external id for another user" do
-    blob = build_blob(user: users(:two), external_id: blobs(:one).external_id)
+    blob = build_blob(user: users(:bob), external_id: blobs(:readme_blob).external_id)
 
     assert blob.valid?
   end
@@ -55,7 +55,7 @@ class BlobTest < ActiveSupport::TestCase
   end
 
   test "invalid with duplicate storage key" do
-    blob = build_blob(storage_key: blobs(:one).storage_key)
+    blob = build_blob(storage_key: blobs(:readme_blob).storage_key)
 
     assert_not blob.valid?
     assert_includes blob.errors[:storage_key], "has already been taken"
@@ -86,8 +86,8 @@ class BlobTest < ActiveSupport::TestCase
 
   def build_blob(attributes = {})
     Blob.new({
-      user: users(:one),
-      storage_provider: storage_providers(:one),
+      user: users(:jim),
+      storage_provider: storage_providers(:acme_filesystem),
       external_id: "uploads/new-file.txt",
       storage_key: "33333333-3333-4333-8333-333333333333",
       size_bytes: 512,

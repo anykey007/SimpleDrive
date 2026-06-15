@@ -2,14 +2,14 @@ require "test_helper"
 
 class Storage::FactoryTest < ActiveSupport::TestCase
   test "builds a filesystem adapter successfully with valid storage provider" do
-    provider = storage_providers(:one) # This is defined as 'filesystem' in fixtures
+    provider = storage_providers(:acme_filesystem) # This is defined as 'filesystem' in fixtures
     assert_equal "filesystem", provider.adapter_type
 
     adapter = Storage::Factory.build(provider, storage_key: "abc123key")
     assert_instance_of Storage::Filesystem, adapter
 
     # Verify initialized path and key via public interface
-    assert_equal "test_storage/one", adapter.options[:storage_path]
+    assert_equal "test_storage/acme", adapter.options[:storage_path]
     assert_equal "abc123key", adapter.storage_key
   end
 
@@ -65,7 +65,7 @@ class Storage::FactoryTest < ActiveSupport::TestCase
   end
 
   test "builds a database adapter successfully with valid storage provider" do
-    provider = storage_providers(:three)
+    provider = storage_providers(:cyberdyne_database)
 
     adapter = Storage::Factory.build(provider, storage_key: "dbkey")
     assert_instance_of Storage::Database, adapter
@@ -73,7 +73,7 @@ class Storage::FactoryTest < ActiveSupport::TestCase
   end
 
   test "builds an ftp adapter successfully with valid storage provider" do
-    provider = storage_providers(:four)
+    provider = storage_providers(:uplink_ftp)
 
     adapter = Storage::Factory.build(provider, storage_key: "ftpkey")
     assert_instance_of Storage::Ftp, adapter

@@ -2,7 +2,7 @@ require "test_helper"
 
 class TenantTest < ActiveSupport::TestCase
   test "valid with a name" do
-    assert tenants(:one).valid?
+    assert tenants(:acme).valid?
   end
 
   test "invalid without a name" do
@@ -13,6 +13,6 @@ class TenantTest < ActiveSupport::TestCase
   end
 
   test "has many users" do
-    assert_includes tenants(:one).users, users(:one)
+    assert_includes tenants(:acme).users, users(:jim)
   end
 end

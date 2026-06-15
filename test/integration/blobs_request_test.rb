@@ -38,9 +38,9 @@ class BlobsRequestTest < ActionDispatch::IntegrationTest
 
     blob = Blob.last
     assert_equal @valid_params[:id], blob.external_id
-    assert_equal users(:one), blob.user
+    assert_equal users(:jim), blob.user
 
-    expected_provider = storage_providers(:one)
+    expected_provider = storage_providers(:acme_filesystem)
     assert_equal expected_provider, blob.storage_provider
 
     expected_file_path = Rails.root.join(
@@ -68,9 +68,9 @@ class BlobsRequestTest < ActionDispatch::IntegrationTest
 
     blob = Blob.last
     assert_equal @valid_params[:id], blob.external_id
-    assert_equal users(:two), blob.user
+    assert_equal users(:bob), blob.user
 
-    expected_provider = storage_providers(:two)
+    expected_provider = storage_providers(:globex_s3)
     assert_equal expected_provider, blob.storage_provider
     assert_equal "s3", expected_provider.adapter_type
 
@@ -83,7 +83,7 @@ class BlobsRequestTest < ActionDispatch::IntegrationTest
   end
 
   test "successfully saves blob record and stores file in the database" do
-    provider = storage_providers(:three)
+    provider = storage_providers(:cyberdyne_database)
     db_headers = { "Authorization" => "Bearer d88214fa3ca59d332d78632eb54957f467e10fa0628213e2c1896fb0c37338ff" }
 
     assert_difference -> { Blob.count }, 1 do
@@ -97,7 +97,7 @@ class BlobsRequestTest < ActionDispatch::IntegrationTest
 
     blob = Blob.last
     assert_equal @valid_params[:id], blob.external_id
-    assert_equal users(:three), blob.user
+    assert_equal users(:sarah), blob.user
     assert_equal provider, blob.storage_provider
 
     # Verify that the blob content is stored in the database's blob_data_objects table
@@ -117,7 +117,7 @@ class BlobsRequestTest < ActionDispatch::IntegrationTest
   end
 
   test "returns unprocessable entity when no active storage provider exists" do
-    api_tokens(:one).user.tenant.storage_providers.update_all(active: false)
+    api_tokens(:jim_token).user.tenant.storage_providers.update_all(active: false)
 
     assert_no_difference -> { Blob.count } do
       post "/v1/blobs",
@@ -132,8 +132,8 @@ class BlobsRequestTest < ActionDispatch::IntegrationTest
 
   test "returns unprocessable entity when blob validation fails" do
     Blob.create!(
-      user: users(:one),
-      storage_provider: storage_providers(:one),
+      user: users(:jim),
+      storage_provider: storage_providers(:acme_filesystem),
       external_id: @valid_params[:id],
       size_bytes: 10,
       checksum_sha256: "dummy_checksum",
@@ -304,7 +304,7 @@ class BlobsRequestTest < ActionDispatch::IntegrationTest
   end
 
   test "successfully saves blob record and stores file in the FTP server" do
-    provider = storage_providers(:four)
+    provider = storage_providers(:uplink_ftp)
     ftp_headers = { "Authorization" => "Bearer f44319627c65ed15e80b36a9029a34c3eb3eb57cb2c13defa3fd8acf1b8ef7b4" }
 
     assert_difference -> { Blob.count }, 1 do
@@ -318,7 +318,7 @@ class BlobsRequestTest < ActionDispatch::IntegrationTest
 
     blob = Blob.last
     assert_equal @valid_params[:id], blob.external_id
-    assert_equal users(:four), blob.user
+    assert_equal users(:uplink_user), blob.user
     assert_equal provider, blob.storage_provider
 
     # Verify that we can retrieve the blob via GET /v1/blobs/:id successfully
@@ -333,7 +333,7 @@ class BlobsRequestTest < ActionDispatch::IntegrationTest
   end
 
   test "POST /v1/blobs returns 422 if storing the file fails with Storage::WriteDataError" do
-    storage_provider = storage_providers(:one)
+    storage_provider = storage_providers(:acme_filesystem)
     mock_adapter = Storage::Filesystem.new(options: storage_provider.configuration, storage_key: "dummy_key")
 
     mock_adapter.stub(:store, ->(*args) { raise Storage::WriteDataError.new("dummy_key", "Simulated write failure") }) do
