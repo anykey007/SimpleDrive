@@ -30,4 +30,20 @@ class Storage::BaseTest < ActiveSupport::TestCase
 
     assert_equal "Storage::Base must implement #retrieve", error.message
   end
+
+  test "require_options! raises Storage::ConfigurationError with sorted missing options" do
+    base = Storage::Base.new(storage_key: "some_key", options: { "foo" => "bar" })
+
+    assert_nothing_raised do
+      base.send(:require_options!, :foo)
+    end
+
+    error = assert_raises(Storage::ConfigurationError) do
+      base.send(:require_options!, :foo, :baz, :qux)
+    end
+
+    assert_equal ["baz", "qux"], error.missing_keys
+    assert_equal "Storage::Base", error.adapter_class
+    assert_equal "Missing required options: baz, qux for Storage::Base", error.message
+  end
 end

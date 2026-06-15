@@ -53,12 +53,15 @@ class Storage::FilesystemTest < ActiveSupport::TestCase
 end
 
 class Storage::FilesystemInitializationTest < ActiveSupport::TestCase
-  test "raises ArgumentError when storage_path or storage_key is missing" do
-    assert_raises(ArgumentError) { Storage::Filesystem.new(storage_key: "key") }
+  test "raises ArgumentError when storage_key is missing or nil" do
     assert_raises(ArgumentError) { Storage::Filesystem.new(options: { storage_path: "path" }) }
-    assert_raises(ArgumentError) { Storage::Filesystem.new(options: nil, storage_key: "key") }
-    assert_raises(ArgumentError) { Storage::Filesystem.new(options: { storage_path: nil }, storage_key: "key") }
     assert_raises(ArgumentError) { Storage::Filesystem.new(options: { storage_path: "path" }, storage_key: nil) }
+  end
+
+  test "raises Storage::ConfigurationError when storage_path is missing or nil" do
+    assert_raises(Storage::ConfigurationError) { Storage::Filesystem.new(storage_key: "key") }
+    assert_raises(Storage::ConfigurationError) { Storage::Filesystem.new(options: nil, storage_key: "key") }
+    assert_raises(Storage::ConfigurationError) { Storage::Filesystem.new(options: { storage_path: nil }, storage_key: "key") }
   end
 
   test "retrieves with storage path configured during initialization" do

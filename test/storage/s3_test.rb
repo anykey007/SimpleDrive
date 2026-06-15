@@ -11,6 +11,13 @@ class Storage::S3Test < ActiveSupport::TestCase
     assert_raises(ArgumentError) { Storage::S3.new(storage_key: nil) }
   end
 
+  test "raises Storage::ConfigurationError when required options are missing" do
+    error = assert_raises(Storage::ConfigurationError) do
+      Storage::S3.new(storage_key: @storage_key)
+    end
+    assert_equal ["access_key_id", "bucket", "endpoint", "secret_access_key"], error.missing_keys
+  end
+
   test "stores file content to s3" do
     config = storage_providers(:two).configuration
 

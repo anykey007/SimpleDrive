@@ -4,7 +4,7 @@ module Storage
   class Filesystem < Base
     def initialize(storage_key:, options: {})
       super(storage_key: storage_key, options: options)
-      raise ArgumentError, "storage_path is required" if self.options[:storage_path].nil?
+      require_options!(:storage_path)
     end
 
     def store(io:)

@@ -4,6 +4,7 @@ module Storage
   class S3 < Base
     def initialize(storage_key:, options: {})
       super(storage_key: storage_key, options: options)
+      require_options!(:bucket, :access_key_id, :secret_access_key, :endpoint)
     end
 
     def client

@@ -43,20 +43,30 @@ class Storage::FtpTest < ActiveSupport::TestCase
     end
   end
 
-  test "raises ArgumentError when root_path is missing" do
-    assert_raises(ArgumentError) do
+  test "raises Storage::ConfigurationError when root_path is missing" do
+    assert_raises(Storage::ConfigurationError) do
       Storage::Ftp.new(
         options: @provider.configuration.merge(root_path: nil),
         storage_key: @storage_key
       )
     end
 
-    assert_raises(ArgumentError) do
+    assert_raises(Storage::ConfigurationError) do
       Storage::Ftp.new(
         options: @provider.configuration.except(:root_path),
         storage_key: @storage_key
       )
     end
+  end
+
+  test "raises Storage::ConfigurationError when multiple options are missing" do
+    error = assert_raises(Storage::ConfigurationError) do
+      Storage::Ftp.new(
+        options: {},
+        storage_key: @storage_key
+      )
+    end
+    assert_equal ["host", "password", "port", "root_path", "username"], error.missing_keys
   end
 
   test "raises Errno::ENOENT on retrieve if file is not found on FTP" do

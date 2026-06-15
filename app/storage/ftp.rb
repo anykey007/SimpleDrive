@@ -5,7 +5,7 @@ module Storage
   class Ftp < Base
     def initialize(storage_key:, options: {})
       super(storage_key: storage_key, options: options)
-      raise ArgumentError, "root_path is required" if self.options[:root_path].nil?
+      require_options!(:host, :port, :username, :password, :root_path)
     end
 
     def store(io:)
