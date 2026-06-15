@@ -4,4 +4,8 @@ class User < ApplicationRecord
   has_many :blobs, dependent: :destroy
 
   validates :email, presence: true, uniqueness: { scope: :tenant_id }
+
+  def default_storage_provider
+    tenant.storage_providers.active.first
+  end
 end

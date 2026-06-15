@@ -9,7 +9,7 @@ module V1
     def create
       decoded_data = Base64.strict_decode64(params[:data].to_s)
 
-      storage_provider = @current_user.tenant.storage_providers.active.first
+      storage_provider = @current_user.default_storage_provider
 
       unless storage_provider
         render json: { error: "No active storage provider found" }, status: :unprocessable_entity

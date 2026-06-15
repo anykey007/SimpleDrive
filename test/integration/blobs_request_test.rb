@@ -40,7 +40,7 @@ class BlobsRequestTest < ActionDispatch::IntegrationTest
     assert_equal @valid_params[:id], blob.external_id
     assert_equal users(:one), blob.user
 
-    expected_provider = api_tokens(:one).user.tenant.storage_providers.active.first
+    expected_provider = storage_providers(:one)
     assert_equal expected_provider, blob.storage_provider
 
     expected_file_path = Rails.root.join(
@@ -70,7 +70,7 @@ class BlobsRequestTest < ActionDispatch::IntegrationTest
     assert_equal @valid_params[:id], blob.external_id
     assert_equal users(:two), blob.user
 
-    expected_provider = api_tokens(:two).user.tenant.storage_providers.active.first
+    expected_provider = storage_providers(:two)
     assert_equal expected_provider, blob.storage_provider
     assert_equal "s3", expected_provider.adapter_type
 
