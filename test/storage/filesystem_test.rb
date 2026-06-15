@@ -15,7 +15,7 @@ class Storage::FilesystemTest < ActiveSupport::TestCase
 
   test "stores file content using sharded storage key path" do
     storage_key = "abcdef123456"
-    @storage = Storage::Filesystem.new(storage_path: @storage_path, storage_key: storage_key)
+    @storage = Storage::Filesystem.new(options: { storage_path: @storage_path }, storage_key: storage_key)
 
     io = StringIO.new("Hello Simple Storage World!")
 
@@ -31,7 +31,7 @@ class Storage::FilesystemTest < ActiveSupport::TestCase
     storage_key = "001122334455"
     content = "\x00\x01\x02binary".b
 
-    @storage = Storage::Filesystem.new(storage_path: @storage_path, storage_key: storage_key)
+    @storage = Storage::Filesystem.new(options: { storage_path: @storage_path }, storage_key: storage_key)
 
     @storage.store(io: StringIO.new(content))
 
@@ -41,7 +41,7 @@ class Storage::FilesystemTest < ActiveSupport::TestCase
   test "retrieves stored file as readable binary io" do
     storage_key = "feedface"
 
-    @storage = Storage::Filesystem.new(storage_path: @storage_path, storage_key: storage_key)
+    @storage = Storage::Filesystem.new(options: { storage_path: @storage_path }, storage_key: storage_key)
     @storage.store(io: StringIO.new("stored content"))
 
     retrieved = @storage.retrieve
@@ -55,19 +55,20 @@ end
 class Storage::FilesystemInitializationTest < ActiveSupport::TestCase
   test "raises ArgumentError when storage_path or storage_key is missing" do
     assert_raises(ArgumentError) { Storage::Filesystem.new(storage_key: "key") }
-    assert_raises(ArgumentError) { Storage::Filesystem.new(storage_path: "path") }
-    assert_raises(ArgumentError) { Storage::Filesystem.new(storage_path: nil, storage_key: "key") }
-    assert_raises(ArgumentError) { Storage::Filesystem.new(storage_path: "path", storage_key: nil) }
+    assert_raises(ArgumentError) { Storage::Filesystem.new(options: { storage_path: "path" }) }
+    assert_raises(ArgumentError) { Storage::Filesystem.new(options: nil, storage_key: "key") }
+    assert_raises(ArgumentError) { Storage::Filesystem.new(options: { storage_path: nil }, storage_key: "key") }
+    assert_raises(ArgumentError) { Storage::Filesystem.new(options: { storage_path: "path" }, storage_key: nil) }
   end
 
   test "retrieves with storage path configured during initialization" do
     Dir.mktmpdir("simple-drive-storage") do |tmpdir|
       storage_path = File.join(tmpdir, "tenant-2")
       storage_key = "cafebabe"
-      writer = Storage::Filesystem.new(storage_path: storage_path, storage_key: storage_key)
+      writer = Storage::Filesystem.new(options: { storage_path: storage_path }, storage_key: storage_key)
       writer.store(io: StringIO.new("configured path"))
 
-      reader = Storage::Filesystem.new(storage_path: storage_path, storage_key: storage_key)
+      reader = Storage::Filesystem.new(options: { storage_path: storage_path }, storage_key: storage_key)
       retrieved = reader.retrieve
 
       assert_equal "configured path", retrieved.read

@@ -4,22 +4,13 @@ require "stringio"
 class Storage::FtpTest < ActiveSupport::TestCase
   setup do
     @provider = storage_providers(:four)
-    config = @provider.configuration
-    @host = config["host"]
-    @port = config["port"]
-    @username = config["username"]
-    @password = config["password"]
-    @root_path = config["root_path"]
+    @root_path = @provider.configuration[:root_path]
     @storage_key = "test_ftp_file_key"
   end
 
   test "stores and retrieves file content on FTP server" do
     storage = Storage::Ftp.new(
-      host: @host,
-      port: @port,
-      username: @username,
-      password: @password,
-      root_path: @root_path,
+      options: @provider.configuration,
       storage_key: @storage_key
     )
 
@@ -40,22 +31,14 @@ class Storage::FtpTest < ActiveSupport::TestCase
   test "raises ArgumentError when storage_key is missing" do
     assert_raises(ArgumentError) do
       Storage::Ftp.new(
-        host: @host,
-        port: @port,
-        username: @username,
-        password: @password,
-        root_path: @root_path,
+        options: @provider.configuration,
         storage_key: nil
       )
     end
 
     assert_raises(ArgumentError) do
       Storage::Ftp.new(
-        host: @host,
-        port: @port,
-        username: @username,
-        password: @password,
-        root_path: @root_path
+        options: @provider.configuration
       )
     end
   end
@@ -63,21 +46,14 @@ class Storage::FtpTest < ActiveSupport::TestCase
   test "raises ArgumentError when root_path is missing" do
     assert_raises(ArgumentError) do
       Storage::Ftp.new(
-        host: @host,
-        port: @port,
-        username: @username,
-        password: @password,
-        root_path: nil,
+        options: @provider.configuration.merge(root_path: nil),
         storage_key: @storage_key
       )
     end
 
     assert_raises(ArgumentError) do
       Storage::Ftp.new(
-        host: @host,
-        port: @port,
-        username: @username,
-        password: @password,
+        options: @provider.configuration.except(:root_path),
         storage_key: @storage_key
       )
     end
@@ -85,11 +61,7 @@ class Storage::FtpTest < ActiveSupport::TestCase
 
   test "raises Errno::ENOENT on retrieve if file is not found on FTP" do
     storage = Storage::Ftp.new(
-      host: @host,
-      port: @port,
-      username: @username,
-      password: @password,
-      root_path: @root_path,
+      options: @provider.configuration,
       storage_key: "nonexistent_key_here_1234"
     )
 

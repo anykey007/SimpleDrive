@@ -6,6 +6,19 @@ class Storage::BaseTest < ActiveSupport::TestCase
     assert_raises(ArgumentError) { Storage::Base.new(storage_key: nil) }
   end
 
+  test "initializes options with indifferent access" do
+    base = Storage::Base.new(storage_key: "some_key", options: { "foo" => "bar" })
+    assert_equal "bar", base.options[:foo]
+    assert_equal "bar", base.options["foo"]
+    assert_instance_of ActiveSupport::HashWithIndifferentAccess, base.options
+  end
+
+  test "options defaults to empty hash" do
+    base = Storage::Base.new(storage_key: "some_key")
+    assert_empty base.options
+    assert_instance_of ActiveSupport::HashWithIndifferentAccess, base.options
+  end
+
   test "store must be implemented by subclasses" do
     error = assert_raises(NotImplementedError) { Storage::Base.new(storage_key: "some_key").store }
 

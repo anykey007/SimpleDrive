@@ -8,9 +8,9 @@ class Storage::FactoryTest < ActiveSupport::TestCase
     adapter = Storage::Factory.build(provider, storage_key: "abc123key")
     assert_instance_of Storage::Filesystem, adapter
 
-    # Verify initialized path
-    assert_equal "test_storage/one", adapter.instance_variable_get(:@storage_path)
-    assert_equal "abc123key", adapter.instance_variable_get(:@storage_key)
+    # Verify initialized path and key via public interface
+    assert_equal "test_storage/one", adapter.options[:storage_path]
+    assert_equal "abc123key", adapter.storage_key
   end
 
   test "builds filesystem adapter with symbol-keyed configurations" do
@@ -22,7 +22,8 @@ class Storage::FactoryTest < ActiveSupport::TestCase
 
     adapter = Storage::Factory.build(provider, storage_key: "symkey")
     assert_instance_of Storage::Filesystem, adapter
-    assert_equal "storage/symbol_path", adapter.instance_variable_get(:@storage_path)
+    assert_equal "storage/symbol_path", adapter.options[:storage_path]
+    assert_equal "symkey", adapter.storage_key
   end
 
   test "builds an s3 adapter successfully with valid storage provider" do
@@ -40,7 +41,7 @@ class Storage::FactoryTest < ActiveSupport::TestCase
 
     adapter = Storage::Factory.build(provider, storage_key: "s3key")
     assert_instance_of Storage::S3, adapter
-    assert_equal "my-s3-bucket", adapter.bucket_name
+    assert_equal "my-s3-bucket", adapter.options[:bucket]
     assert_equal "s3key", adapter.storage_key
   end
 
@@ -59,7 +60,7 @@ class Storage::FactoryTest < ActiveSupport::TestCase
 
     adapter = Storage::Factory.build(provider, storage_key: "s3key")
     assert_instance_of Storage::S3, adapter
-    assert_equal "my-s3-bucket-symbol", adapter.bucket_name
+    assert_equal "my-s3-bucket-symbol", adapter.options[:bucket]
     assert_equal "s3key", adapter.storage_key
   end
 
@@ -68,7 +69,7 @@ class Storage::FactoryTest < ActiveSupport::TestCase
 
     adapter = Storage::Factory.build(provider, storage_key: "dbkey")
     assert_instance_of Storage::Database, adapter
-    assert_equal "dbkey", adapter.instance_variable_get(:@storage_key)
+    assert_equal "dbkey", adapter.storage_key
   end
 
   test "builds an ftp adapter successfully with valid storage provider" do
@@ -76,12 +77,12 @@ class Storage::FactoryTest < ActiveSupport::TestCase
 
     adapter = Storage::Factory.build(provider, storage_key: "ftpkey")
     assert_instance_of Storage::Ftp, adapter
-    assert_equal "localhost", adapter.instance_variable_get(:@host)
-    assert_equal 21, adapter.instance_variable_get(:@port)
-    assert_equal "ftpuser", adapter.instance_variable_get(:@username)
-    assert_equal "ftppassword", adapter.instance_variable_get(:@password)
-    assert_equal "/test", adapter.instance_variable_get(:@root_path)
-    assert_equal "ftpkey", adapter.instance_variable_get(:@storage_key)
+    assert_equal "localhost", adapter.options[:host]
+    assert_equal 21, adapter.options[:port]
+    assert_equal "ftpuser", adapter.options[:username]
+    assert_equal "ftppassword", adapter.options[:password]
+    assert_equal "/test", adapter.options[:root_path]
+    assert_equal "ftpkey", adapter.storage_key
   end
 
   test "raises ArgumentError when storage provider is nil" do

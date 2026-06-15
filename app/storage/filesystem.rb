@@ -2,10 +2,9 @@ require "fileutils"
 
 module Storage
   class Filesystem < Base
-    def initialize(storage_path:, storage_key:)
-      super(storage_key: storage_key)
-      raise ArgumentError, "storage_path is required" if storage_path.nil?
-      @storage_path = storage_path
+    def initialize(storage_key:, options: {})
+      super(storage_key: storage_key, options: options)
+      raise ArgumentError, "storage_path is required" if self.options[:storage_path].nil?
     end
 
     def store(io:)
@@ -24,7 +23,7 @@ module Storage
 
     def file_path
       @file_path ||= File.join(
-        @storage_path,
+        options[:storage_path],
         storage_key[0, 2],
         storage_key[2, 2],
         storage_key

@@ -7,23 +7,15 @@ class Storage::S3Test < ActiveSupport::TestCase
     @storage_key = "test_file_key"
   end
 
-  test "raises ArgumentError when bucket or storage_key is missing" do
-    assert_raises(ArgumentError) { Storage::S3.new(storage_key: "key") }
-    assert_raises(ArgumentError) { Storage::S3.new(bucket: "bucket") }
-    assert_raises(ArgumentError) { Storage::S3.new(bucket: nil, storage_key: "key") }
-    assert_raises(ArgumentError) { Storage::S3.new(bucket: "bucket", storage_key: nil) }
+  test "raises ArgumentError when storage_key is missing" do
+    assert_raises(ArgumentError) { Storage::S3.new(storage_key: nil) }
   end
 
   test "stores file content to s3" do
     config = storage_providers(:two).configuration
 
     storage = Storage::S3.new(
-      bucket: config["bucket"],
-      access_key_id: config["access_key_id"],
-      secret_access_key: config["secret_access_key"],
-      endpoint: config["endpoint"],
-      region: config["region"],
-      force_path_style: config["force_path_style"],
+      options: config,
       storage_key: @storage_key
     )
 

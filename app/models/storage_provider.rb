@@ -6,4 +6,8 @@ class StorageProvider < ApplicationRecord
 
   validates :name, presence: true, uniqueness: { scope: :tenant_id }
   validates :adapter_type, presence: true
+
+  def configuration
+    (super || {}).with_indifferent_access
+  end
 end

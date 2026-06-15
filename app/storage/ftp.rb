@@ -3,15 +3,9 @@ require "stringio"
 
 module Storage
   class Ftp < Base
-    def initialize(root_path:, storage_key:, host: nil, port: nil, username: nil, password: nil)
-      super(storage_key: storage_key)
-      raise ArgumentError, "root_path is required" if root_path.nil?
-
-      @host = host || "localhost"
-      @port = (port || 21).to_i
-      @username = username
-      @password = password
-      @root_path = root_path
+    def initialize(storage_key:, options: {})
+      super(storage_key: storage_key, options: options)
+      raise ArgumentError, "root_path is required" if self.options[:root_path].nil?
     end
 
     def store(io:)
@@ -48,7 +42,7 @@ module Storage
 
     def file_path
       @file_path ||= File.join(
-        @root_path,
+        options[:root_path],
         storage_key[0, 2],
         storage_key[2, 2],
         storage_key
@@ -57,8 +51,8 @@ module Storage
 
     def with_ftp
       ftp = Net::FTP.new
-      ftp.connect(@host, @port)
-      ftp.login(@username, @password)
+      ftp.connect(options[:host], options[:port])
+      ftp.login(options[:username], options[:password])
       ftp.passive = true
       yield ftp
     ensure
