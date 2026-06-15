@@ -11,3 +11,7 @@ two:
 three:
   tenant: three
   email: sarah@cyberdyne.test
+
+four:
+  tenant: four
+  email: user@uplink.test

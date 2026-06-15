@@ -50,3 +50,21 @@ StorageProvider.find_or_create_by!(
 )
 
 create_user(tenant, "sarah@cyberdyne.test", "d88214fa3ca59d332d78632eb54957f467e10fa0628213e2c1896fb0c37338ff")
+
+# Fourth tenant seeds
+tenant = Tenant.find_or_create_by!(name: "Uplink")
+StorageProvider.find_or_create_by!(
+  tenant: tenant,
+  name: "FTP Storage",
+  adapter_type: "ftp",
+  configuration: {
+    "host" => "localhost",
+    "port" => 21,
+    "username" => "ftpuser",
+    "password" => "ftppassword",
+    "root_path" => "/development"
+  },
+  active: true
+)
+
+create_user(tenant, "user@uplink.test", "f44319627c65ed15e80b36a9029a34c3eb3eb57cb2c13defa3fd8acf1b8ef7b4")

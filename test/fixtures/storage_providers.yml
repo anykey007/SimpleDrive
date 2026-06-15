@@ -25,3 +25,15 @@ three:
   adapter_type: database
   configuration: {}
   active: true
+
+four:
+  tenant: four
+  name: FTP Storage
+  adapter_type: ftp
+  configuration:
+    host: localhost
+    port: 21
+    username: ftpuser
+    password: ftppassword
+    root_path: /test
+  active: true

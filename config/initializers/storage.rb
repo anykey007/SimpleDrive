@@ -4,4 +4,5 @@ require_dependency Rails.root.join("app/storage/base").to_s
 require_dependency Rails.root.join("app/storage/filesystem").to_s
 require_dependency Rails.root.join("app/storage/s3").to_s
 require_dependency Rails.root.join("app/storage/database").to_s
+require_dependency Rails.root.join("app/storage/ftp").to_s
 require_dependency Rails.root.join("app/storage/factory").to_s

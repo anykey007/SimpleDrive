@@ -71,6 +71,19 @@ class Storage::FactoryTest < ActiveSupport::TestCase
     assert_equal "dbkey", adapter.instance_variable_get(:@storage_key)
   end
 
+  test "builds an ftp adapter successfully with valid storage provider" do
+    provider = storage_providers(:four)
+
+    adapter = Storage::Factory.build(provider, storage_key: "ftpkey")
+    assert_instance_of Storage::Ftp, adapter
+    assert_equal "localhost", adapter.instance_variable_get(:@host)
+    assert_equal 21, adapter.instance_variable_get(:@port)
+    assert_equal "ftpuser", adapter.instance_variable_get(:@username)
+    assert_equal "ftppassword", adapter.instance_variable_get(:@password)
+    assert_equal "/test", adapter.instance_variable_get(:@root_path)
+    assert_equal "ftpkey", adapter.instance_variable_get(:@storage_key)
+  end
+
   test "raises ArgumentError when storage provider is nil" do
     error = assert_raises(ArgumentError) do
       Storage::Factory.build(nil)

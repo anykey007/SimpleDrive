@@ -274,6 +274,35 @@ class BlobsRequestTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "successfully saves blob record and stores file in the FTP server" do
+    provider = storage_providers(:four)
+    ftp_headers = { "Authorization" => "Bearer f44319627c65ed15e80b36a9029a34c3eb3eb57cb2c13defa3fd8acf1b8ef7b4" }
+
+    assert_difference -> { Blob.count }, 1 do
+      post "/v1/blobs",
+        params: @valid_params,
+        headers: ftp_headers,
+        as: :json
+    end
+
+    assert_response :no_content
+
+    blob = Blob.last
+    assert_equal @valid_params[:id], blob.external_id
+    assert_equal users(:four), blob.user
+    assert_equal provider, blob.storage_provider
+
+    # Verify that we can retrieve the blob via GET /v1/blobs/:id successfully
+    get "/v1/blobs/#{@valid_params[:id]}",
+      headers: ftp_headers
+
+    assert_response :success
+    json_response = JSON.parse(response.body)
+    assert_equal @valid_params[:id], json_response["id"]
+    assert_equal @valid_params[:data], json_response["data"]
+    assert_equal "27", json_response["size"]
+  end
+
   private
 
   def track_created_blob_file

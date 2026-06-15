@@ -8,6 +8,7 @@ gem "puma", ">= 5.0"
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 gem "bootsnap", require: false
 gem "thruster", require: false
+gem "net-ftp"
 # gem "rack-cors"
 
 group :development, :test do

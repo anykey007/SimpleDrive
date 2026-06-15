@@ -27,6 +27,16 @@ module Storage
         Storage::Database.new(
           storage_key: storage_key
         )
+      when "ftp"
+        config = storage_provider.configuration || {}
+        Storage::Ftp.new(
+          host: config["host"] || config[:host],
+          port: config["port"] || config[:port],
+          username: config["username"] || config[:username],
+          password: config["password"] || config[:password],
+          root_path: config["root_path"] || config[:root_path],
+          storage_key: storage_key
+        )
       else
         raise ArgumentError, "Unknown storage provider adapter type: #{storage_provider.adapter_type}"
       end
