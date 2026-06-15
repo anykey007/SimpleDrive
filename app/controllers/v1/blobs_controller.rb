@@ -9,7 +9,7 @@ module V1
     def create
       decoded_data = Base64.strict_decode64(params[:data].to_s)
 
-      storage_provider = @api_token.user.tenant.storage_providers.active.first
+      storage_provider = @current_user.tenant.storage_providers.active.first
 
       unless storage_provider
         render json: { error: "No active storage provider found" }, status: :unprocessable_entity
@@ -17,7 +17,7 @@ module V1
       end
 
       blob = Blob.new(
-        user: @api_token.user,
+        user: @current_user,
         storage_provider: storage_provider,
         external_id: params[:id],
         size_bytes: decoded_data.bytesize,
@@ -39,10 +39,10 @@ module V1
 
     def show
       external_id = params[:id]
-      blob = @api_token.user.blobs.find_by(external_id: external_id)
+      blob = @current_user.blobs.find_by(external_id: external_id)
 
       if blob.nil? && !external_id.start_with?("/")
-        blob = @api_token.user.blobs.find_by(external_id: "/" + external_id)
+        blob = @current_user.blobs.find_by(external_id: "/" + external_id)
       end
 
       if blob.nil?
@@ -70,23 +70,6 @@ module V1
       rescue => e
         render json: { error: "Failed to retrieve storage data: #{e.message}" }, status: :internal_server_error
       end
-    end
-
-    private
-
-    def authenticate_user!
-      token = bearer_token
-      @api_token = token.present? && ApiToken.lookup(token)
-
-      return if @api_token
-
-      render json: { error: "Unauthorized" }, status: :unauthorized
-    end
-
-    def bearer_token
-      authorization = request.authorization.to_s
-      match = authorization.match(/\ABearer\s+(.+)\z/)
-      match && match[1]
     end
   end
 end
