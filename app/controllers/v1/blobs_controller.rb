@@ -41,16 +41,7 @@ module V1
 
     def show
       external_id = params[:id]
-      blob = @current_user.blobs.find_by(external_id: external_id)
-
-      if blob.nil? && !external_id.start_with?("/")
-        blob = @current_user.blobs.find_by(external_id: "/" + external_id)
-      end
-
-      if blob.nil?
-        render json: { error: "Blob not found" }, status: :not_found
-        return
-      end
+      blob = @current_user.blobs.find_by!(external_id: external_id)
 
       storage_provider = blob.storage_provider
       adapter = Storage::Factory.build(storage_provider, storage_key: blob.storage_key)
@@ -74,6 +65,8 @@ module V1
       rescue => e
         render json: { error: "Failed to retrieve storage data: #{e.message}" }, status: :internal_server_error
       end
+    rescue ActiveRecord::RecordNotFound => e
+      render json: { error: "Blob not found" }, status: :not_found
     end
   end
 end

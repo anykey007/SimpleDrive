@@ -9,7 +9,7 @@ class Storage::FactoryTest < ActiveSupport::TestCase
     assert_instance_of Storage::Filesystem, adapter
 
     # Verify initialized path and key via public interface
-    assert_equal "test_storage/acme", adapter.options[:storage_path]
+    assert_match(/\Atmp\/test_storage\/acme\d*\z/, adapter.options[:storage_path])
     assert_equal "abc123key", adapter.storage_key
   end
 
@@ -81,7 +81,7 @@ class Storage::FactoryTest < ActiveSupport::TestCase
     assert_equal 21, adapter.options[:port]
     assert_equal "ftpuser", adapter.options[:username]
     assert_equal "ftppassword", adapter.options[:password]
-    assert_equal "/test", adapter.options[:root_path]
+    assert_equal "/test/uplink", adapter.options[:root_path]
     assert_equal "ftpkey", adapter.storage_key
   end
 

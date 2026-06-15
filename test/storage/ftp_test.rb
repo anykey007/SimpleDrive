@@ -4,7 +4,6 @@ require "stringio"
 class Storage::FtpTest < ActiveSupport::TestCase
   setup do
     @provider = storage_providers(:uplink_ftp)
-    @root_path = @provider.configuration[:root_path]
     @storage_key = "test_ftp_file_key"
   end
 
@@ -18,8 +17,7 @@ class Storage::FtpTest < ActiveSupport::TestCase
 
     # Verify store returns the correct file path
     stored_path = storage.store(io: io)
-    expected_path = File.join(@root_path, @storage_key[0, 2], @storage_key[2, 2], @storage_key)
-    assert_equal expected_path, stored_path
+    assert_equal "/test/uplink/te/st/test_ftp_file_key", stored_path
 
     # Verify retrieve successfully fetches the content
     retrieved = storage.retrieve
@@ -66,7 +64,7 @@ class Storage::FtpTest < ActiveSupport::TestCase
         storage_key: @storage_key
       )
     end
-    assert_equal ["host", "password", "port", "root_path", "username"], error.missing_keys
+    assert_equal [ "host", "password", "port", "root_path", "username" ], error.missing_keys
   end
 
   test "raises Storage::ReadDataError on retrieve if file is not found on FTP" do

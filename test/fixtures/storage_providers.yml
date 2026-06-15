@@ -3,7 +3,7 @@ acme_filesystem:
   name: Primary
   adapter_type: filesystem
   configuration:
-    storage_path: "test_storage/acme"
+    storage_path: "tmp/test_storage/acme"
   active: true
 
 globex_s3:
@@ -35,5 +35,5 @@ uplink_ftp:
     port: 21
     username: ftpuser
     password: ftppassword
-    root_path: /test
+    root_path: /test/uplink
   active: true

@@ -89,7 +89,7 @@ class BlobTest < ActiveSupport::TestCase
       user: users(:jim),
       storage_provider: storage_providers(:acme_filesystem),
       external_id: "uploads/new-file.txt",
-      storage_key: "33333333-3333-4333-8333-333333333333",
+      storage_key: "99999999-9999-4999-9999-999999999999",
       size_bytes: 512,
       checksum_sha256: "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
     }.merge(attributes))

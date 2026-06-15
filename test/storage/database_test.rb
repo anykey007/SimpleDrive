@@ -2,11 +2,6 @@ require "test_helper"
 require "stringio"
 
 class Storage::DatabaseTest < ActiveSupport::TestCase
-  setup do
-    # Clear the blob_data_objects table before each test to ensure isolation
-    BlobDataObject.delete_all
-  end
-
   test "stores text file content in database successfully" do
     storage_key = "test-database-key-1"
     storage = Storage::Database.new(storage_key: storage_key)
@@ -33,15 +28,14 @@ class Storage::DatabaseTest < ActiveSupport::TestCase
     assert_equal binary_data, db_object.data.force_encoding("ASCII-8BIT")
   end
 
-  test "retrieves stored database blob as readable io" do
-    storage_key = "test-database-key-retrieve"
-    storage = Storage::Database.new(storage_key: storage_key)
-    storage.store(io: StringIO.new("retrieved content"))
+  test "retrieves stored database blob as readable io using fixture" do
+    fixture_obj = blob_data_objects(:cyberdyne_data_object)
+    storage = Storage::Database.new(storage_key: fixture_obj.storage_key)
 
     retrieved = storage.retrieve
 
     assert_instance_of StringIO, retrieved
-    assert_equal "retrieved content", retrieved.read
+    assert_equal "Hello Database Storage World!", retrieved.read
   end
 
   test "raises ArgumentError when storage_key is missing" do

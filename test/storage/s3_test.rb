@@ -15,7 +15,7 @@ class Storage::S3Test < ActiveSupport::TestCase
     error = assert_raises(Storage::ConfigurationError) do
       Storage::S3.new(storage_key: @storage_key)
     end
-    assert_equal ["access_key_id", "bucket", "endpoint", "secret_access_key"], error.missing_keys
+    assert_equal [ "access_key_id", "bucket", "endpoint", "secret_access_key" ], error.missing_keys
   end
 
   test "stores file content to s3" do

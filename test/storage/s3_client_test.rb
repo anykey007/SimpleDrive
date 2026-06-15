@@ -17,7 +17,7 @@ class S3ClientTest < ActiveSupport::TestCase
 
   test "put_object and get_object on real s3 compatible endpoint" do
     data = "Direct client Hello S3 World!"
-    
+
     # Test PUT
     put_response = @client.put_object(@key, data)
     assert_equal "200", put_response.code

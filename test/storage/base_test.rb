@@ -42,7 +42,7 @@ class Storage::BaseTest < ActiveSupport::TestCase
       base.send(:require_options!, :foo, :baz, :qux)
     end
 
-    assert_equal ["baz", "qux"], error.missing_keys
+    assert_equal [ "baz", "qux" ], error.missing_keys
     assert_equal "Storage::Base", error.adapter_class
     assert_equal "Missing required options: baz, qux for Storage::Base", error.message
   end

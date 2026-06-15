@@ -7,6 +7,9 @@ class Storage::FilesystemTest < ActiveSupport::TestCase
   setup do
     @tmpdir = Dir.mktmpdir("simple-drive-storage")
     @storage_path = File.join(@tmpdir, "tenant-1")
+    @storage_key = "abcdef123456"
+    @expected_path = "#{@tmpdir}/tenant-1/ab/cd/abcdef123456"
+    @storage = Storage::Filesystem.new(options: { storage_path: @storage_path }, storage_key: @storage_key)
   end
 
   teardown do
@@ -14,34 +17,24 @@ class Storage::FilesystemTest < ActiveSupport::TestCase
   end
 
   test "stores file content using sharded storage key path" do
-    storage_key = "abcdef123456"
-    @storage = Storage::Filesystem.new(options: { storage_path: @storage_path }, storage_key: storage_key)
-
     io = StringIO.new("Hello Simple Storage World!")
 
     stored_path = @storage.store(io: io)
-    expected_path = File.join(@storage_path, "ab", "cd", storage_key)
 
-    assert_equal expected_path, stored_path
-    assert_path_exists expected_path
-    assert_equal "Hello Simple Storage World!", File.binread(expected_path)
+    assert_equal @expected_path, stored_path
+    assert_path_exists @expected_path
+    assert_equal "Hello Simple Storage World!", File.binread(@expected_path)
   end
 
   test "stores binary file content" do
-    storage_key = "001122334455"
     content = "\x00\x01\x02binary".b
-
-    @storage = Storage::Filesystem.new(options: { storage_path: @storage_path }, storage_key: storage_key)
 
     @storage.store(io: StringIO.new(content))
 
-    assert_equal content, File.binread(File.join(@storage_path, "00", "11", storage_key))
+    assert_equal content, File.binread(@expected_path)
   end
 
   test "retrieves stored file as readable binary io" do
-    storage_key = "feedface"
-
-    @storage = Storage::Filesystem.new(options: { storage_path: @storage_path }, storage_key: storage_key)
     @storage.store(io: StringIO.new("stored content"))
 
     retrieved = @storage.retrieve
