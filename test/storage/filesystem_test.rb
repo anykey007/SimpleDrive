@@ -53,6 +53,13 @@ class Storage::FilesystemTest < ActiveSupport::TestCase
 end
 
 class Storage::FilesystemInitializationTest < ActiveSupport::TestCase
+  test "raises ArgumentError when storage_path or storage_key is missing" do
+    assert_raises(ArgumentError) { Storage::Filesystem.new(storage_key: "key") }
+    assert_raises(ArgumentError) { Storage::Filesystem.new(storage_path: "path") }
+    assert_raises(ArgumentError) { Storage::Filesystem.new(storage_path: nil, storage_key: "key") }
+    assert_raises(ArgumentError) { Storage::Filesystem.new(storage_path: "path", storage_key: nil) }
+  end
+
   test "retrieves with storage path configured during initialization" do
     Dir.mktmpdir("simple-drive-storage") do |tmpdir|
       storage_path = File.join(tmpdir, "tenant-2")

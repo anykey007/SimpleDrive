@@ -3,19 +3,18 @@ require "stringio"
 
 module Storage
   class Ftp < Base
-    def initialize(host: nil, port: nil, username: nil, password: nil, root_path: nil, storage_key: nil)
+    def initialize(root_path:, storage_key:, host: nil, port: nil, username: nil, password: nil)
+      super(storage_key: storage_key)
+      raise ArgumentError, "root_path is required" if root_path.nil?
+
       @host = host || "localhost"
       @port = (port || 21).to_i
       @username = username
       @password = password
       @root_path = root_path
-      @storage_key = storage_key
     end
 
     def store(io:)
-      raise ArgumentError, "storage_key is required" unless @storage_key
-      raise ArgumentError, "root_path is required" unless @root_path
-
       path = file_path
       dir = File.dirname(path)
 
@@ -28,9 +27,6 @@ module Storage
     end
 
     def retrieve
-      raise ArgumentError, "storage_key is required" unless @storage_key
-      raise ArgumentError, "root_path is required" unless @root_path
-
       path = file_path
       data = String.new
 
@@ -53,9 +49,9 @@ module Storage
     def file_path
       @file_path ||= File.join(
         @root_path,
-        @storage_key[0, 2],
-        @storage_key[2, 2],
-        @storage_key
+        storage_key[0, 2],
+        storage_key[2, 2],
+        storage_key
       )
     end
 

@@ -38,40 +38,48 @@ class Storage::FtpTest < ActiveSupport::TestCase
   end
 
   test "raises ArgumentError when storage_key is missing" do
-    storage = Storage::Ftp.new(
-      host: @host,
-      port: @port,
-      username: @username,
-      password: @password,
-      root_path: @root_path,
-      storage_key: nil
-    )
-
     assert_raises(ArgumentError) do
-      storage.store(io: StringIO.new("content"))
+      Storage::Ftp.new(
+        host: @host,
+        port: @port,
+        username: @username,
+        password: @password,
+        root_path: @root_path,
+        storage_key: nil
+      )
     end
 
     assert_raises(ArgumentError) do
-      storage.retrieve
+      Storage::Ftp.new(
+        host: @host,
+        port: @port,
+        username: @username,
+        password: @password,
+        root_path: @root_path
+      )
     end
   end
 
   test "raises ArgumentError when root_path is missing" do
-    storage = Storage::Ftp.new(
-      host: @host,
-      port: @port,
-      username: @username,
-      password: @password,
-      root_path: nil,
-      storage_key: @storage_key
-    )
-
     assert_raises(ArgumentError) do
-      storage.store(io: StringIO.new("content"))
+      Storage::Ftp.new(
+        host: @host,
+        port: @port,
+        username: @username,
+        password: @password,
+        root_path: nil,
+        storage_key: @storage_key
+      )
     end
 
     assert_raises(ArgumentError) do
-      storage.retrieve
+      Storage::Ftp.new(
+        host: @host,
+        port: @port,
+        username: @username,
+        password: @password,
+        storage_key: @storage_key
+      )
     end
   end
 

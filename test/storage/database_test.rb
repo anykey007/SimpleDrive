@@ -45,14 +45,12 @@ class Storage::DatabaseTest < ActiveSupport::TestCase
   end
 
   test "raises ArgumentError when storage_key is missing" do
-    storage = Storage::Database.new(storage_key: nil)
-
     assert_raises(ArgumentError) do
-      storage.store(io: StringIO.new("content"))
+      Storage::Database.new(storage_key: nil)
     end
 
     assert_raises(ArgumentError) do
-      storage.retrieve
+      Storage::Database.new
     end
   end
 
