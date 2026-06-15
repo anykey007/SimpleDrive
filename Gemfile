@@ -17,3 +17,8 @@ group :development, :test do
   gem "brakeman", require: false
   gem "rubocop-rails-omakase", require: false
 end
+
+group :test do
+  gem "minitest", "~> 6.0"
+  gem "minitest-mock", "~> 5.27"
+end

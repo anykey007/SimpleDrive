@@ -21,6 +21,8 @@ module Storage
     def store(io:)
       client.put_object(storage_key, io)
       storage_key
+    rescue => e
+      raise Storage::WriteDataError.new(storage_key, "Failed to write object to S3 bucket", e)
     end
 
     def retrieve
@@ -28,7 +30,7 @@ module Storage
       StringIO.new(response.body)
     rescue => e
       if e.message.include?("code 404")
-        raise Storage::FileNotFoundError.new(storage_key, "Object not found in S3 bucket", e)
+        raise Storage::ReadDataError.new(storage_key, "Object not found in S3 bucket", e)
       else
         raise e
       end

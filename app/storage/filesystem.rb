@@ -13,12 +13,14 @@ module Storage
       File.binwrite(file_path, io.read)
 
       file_path
+    rescue => e
+      raise Storage::WriteDataError.new(storage_key, "Failed to write file to local filesystem", e)
     end
 
     def retrieve
       File.open(file_path, "rb")
     rescue Errno::ENOENT => e
-      raise Storage::FileNotFoundError.new(storage_key, "File not found on local filesystem", e)
+      raise Storage::ReadDataError.new(storage_key, "File not found on local filesystem", e)
     end
 
     private

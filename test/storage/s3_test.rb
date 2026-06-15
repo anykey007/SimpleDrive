@@ -39,7 +39,7 @@ class Storage::S3Test < ActiveSupport::TestCase
     retrieved&.close
   end
 
-  test "raises Storage::FileNotFoundError when retrieving non-existent file from S3" do
+  test "raises Storage::ReadDataError when retrieving non-existent file from S3" do
     config = storage_providers(:two).configuration
 
     storage = Storage::S3.new(
@@ -47,8 +47,21 @@ class Storage::S3Test < ActiveSupport::TestCase
       storage_key: "non_existent_s3_key_12345"
     )
 
-    assert_raises(Storage::FileNotFoundError) do
+    assert_raises(Storage::ReadDataError) do
       storage.retrieve
+    end
+  end
+
+  test "raises Storage::WriteDataError when writing to S3 fails" do
+    config = storage_providers(:two).configuration
+    storage = Storage::S3.new(options: config, storage_key: @storage_key)
+
+    storage.client.stub(:put_object, ->(*args) { raise StandardError, "Network error" }) do
+      error = assert_raises(Storage::WriteDataError) do
+        storage.store(io: StringIO.new("test"))
+      end
+      assert_equal @storage_key, error.storage_key
+      assert_kind_of StandardError, error.original_exception
     end
   end
 end

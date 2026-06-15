@@ -35,6 +35,8 @@ module V1
       end
     rescue ArgumentError
       render json: { error: "data must be a valid Base64 encoded string" }, status: :unprocessable_entity
+    rescue Storage::WriteDataError => e
+      render json: { error: "Failed to store file: #{e.message}" }, status: :unprocessable_entity
     end
 
     def show
@@ -67,7 +69,7 @@ module V1
           size: blob.size_bytes.to_s,
           created_at: blob.created_at.utc.iso8601
         }, status: :ok
-      rescue Storage::FileNotFoundError => e
+      rescue Storage::ReadDataError => e
         render json: { error: "File content is missing on storage server: #{e.message}" }, status: :not_found
       rescue => e
         render json: { error: "Failed to retrieve storage data: #{e.message}" }, status: :internal_server_error

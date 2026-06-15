@@ -18,6 +18,8 @@ module Storage
       end
 
       path
+    rescue => e
+      raise Storage::WriteDataError.new(storage_key, "Failed to write file to FTP server", e)
     end
 
     def retrieve
@@ -35,7 +37,7 @@ module Storage
     rescue Net::FTPPermError => e
       raise unless e.message.start_with?("550")
 
-      raise Storage::FileNotFoundError.new(storage_key, "File not found on FTP server", e)
+      raise Storage::ReadDataError.new(storage_key, "File not found on FTP server", e)
     end
 
     private

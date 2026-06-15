@@ -69,14 +69,29 @@ class Storage::FtpTest < ActiveSupport::TestCase
     assert_equal ["host", "password", "port", "root_path", "username"], error.missing_keys
   end
 
-  test "raises Storage::FileNotFoundError on retrieve if file is not found on FTP" do
+  test "raises Storage::ReadDataError on retrieve if file is not found on FTP" do
     storage = Storage::Ftp.new(
       options: @provider.configuration,
       storage_key: "nonexistent_key_here_1234"
     )
 
-    assert_raises(Storage::FileNotFoundError) do
+    assert_raises(Storage::ReadDataError) do
       storage.retrieve
+    end
+  end
+
+  test "raises Storage::WriteDataError when writing fails on FTP store" do
+    storage = Storage::Ftp.new(
+      options: @provider.configuration,
+      storage_key: @storage_key
+    )
+
+    storage.stub(:with_ftp, ->(*args) { raise Net::FTPTempError, "421 Service not available" }) do
+      error = assert_raises(Storage::WriteDataError) do
+        storage.store(io: StringIO.new("test"))
+      end
+      assert_equal @storage_key, error.storage_key
+      assert_kind_of Net::FTPTempError, error.original_exception
     end
   end
 end

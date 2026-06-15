@@ -51,10 +51,22 @@ class Storage::FilesystemTest < ActiveSupport::TestCase
     retrieved&.close
   end
 
-  test "raises Storage::FileNotFoundError when file does not exist on retrieve" do
+  test "raises Storage::ReadDataError when file does not exist on retrieve" do
     @storage = Storage::Filesystem.new(options: { storage_path: @storage_path }, storage_key: "missing-key")
-    assert_raises(Storage::FileNotFoundError) do
+    assert_raises(Storage::ReadDataError) do
       @storage.retrieve
+    end
+  end
+
+  test "raises Storage::WriteDataError when writing fails on store" do
+    @storage = Storage::Filesystem.new(options: { storage_path: @storage_path }, storage_key: "some-key")
+
+    File.stub(:binwrite, ->(*args) { raise Errno::EACCES, "Permission denied" }) do
+      error = assert_raises(Storage::WriteDataError) do
+        @storage.store(io: StringIO.new("test"))
+      end
+      assert_equal "some-key", error.storage_key
+      assert_kind_of Errno::EACCES, error.original_exception
     end
   end
 end

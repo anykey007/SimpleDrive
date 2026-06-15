@@ -1,10 +1,20 @@
 module Storage
   class Error < StandardError; end
 
-  class FileNotFoundError < Error
+  class ReadDataError < Error
     attr_reader :storage_key, :original_exception
 
     def initialize(storage_key, message = "File not found in storage", original_exception = nil)
+      @storage_key = storage_key
+      @original_exception = original_exception
+      super("#{message} (key: #{storage_key})")
+    end
+  end
+
+  class WriteDataError < Error
+    attr_reader :storage_key, :original_exception
+
+    def initialize(storage_key, message = "Failed to write file to storage", original_exception = nil)
       @storage_key = storage_key
       @original_exception = original_exception
       super("#{message} (key: #{storage_key})")

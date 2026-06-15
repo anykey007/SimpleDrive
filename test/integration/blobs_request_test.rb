@@ -332,6 +332,27 @@ class BlobsRequestTest < ActionDispatch::IntegrationTest
     assert_equal "27", json_response["size"]
   end
 
+  test "POST /v1/blobs returns 422 if storing the file fails with Storage::WriteDataError" do
+    storage_provider = storage_providers(:one)
+    mock_adapter = Storage::Filesystem.new(options: storage_provider.configuration, storage_key: "dummy_key")
+
+    mock_adapter.stub(:store, ->(*args) { raise Storage::WriteDataError.new("dummy_key", "Simulated write failure") }) do
+      Storage::Factory.stub(:build, mock_adapter) do
+        assert_no_difference -> { Blob.count } do
+          post "/v1/blobs",
+            params: @valid_params,
+            headers: auth_headers,
+            as: :json
+        end
+
+        assert_response :unprocessable_entity
+        json_response = JSON.parse(response.body)
+        assert_includes json_response["error"], "Failed to store file"
+        assert_includes json_response["error"], "Simulated write failure"
+      end
+    end
+  end
+
   private
 
   def track_created_blob_file

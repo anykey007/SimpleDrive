@@ -54,11 +54,24 @@ class Storage::DatabaseTest < ActiveSupport::TestCase
     end
   end
 
-  test "raises Storage::FileNotFoundError when key is not found on retrieve" do
+  test "raises Storage::ReadDataError when key is not found on retrieve" do
     storage = Storage::Database.new(storage_key: "non-existent-key")
 
-    assert_raises(Storage::FileNotFoundError) do
+    assert_raises(Storage::ReadDataError) do
       storage.retrieve
+    end
+  end
+
+  test "raises Storage::WriteDataError when saving fails on store" do
+    storage_key = "test-database-key-fail"
+    storage = Storage::Database.new(storage_key: storage_key)
+
+    BlobDataObject.stub(:create!, ->(*args) { raise ActiveRecord::ActiveRecordError, "DB error" }) do
+      error = assert_raises(Storage::WriteDataError) do
+        storage.store(io: StringIO.new("test"))
+      end
+      assert_equal storage_key, error.storage_key
+      assert_kind_of ActiveRecord::ActiveRecordError, error.original_exception
     end
   end
 end
