@@ -36,7 +36,7 @@ module BlobsRequests
 
         mock_adapter.stub(:store, ->(*args) { raise Storage::WriteDataError.new("dummy_key", "Simulated write failure") }) do
           Storage::Factory.stub(:build, mock_adapter) do
-            assert_no_difference -> { Blob.count } do
+            assert_difference -> { Blob.count }, 1 do
               post "/v1/blobs",
                 params: valid_params,
                 headers: auth_header(users(:jim)),
@@ -47,6 +47,8 @@ module BlobsRequests
             json_response = JSON.parse(response.body)
             assert_includes json_response["error"], "Failed to store file"
             assert_includes json_response["error"], "Simulated write failure"
+
+            assert_equal "failed", Blob.last.status
           end
         end
       end

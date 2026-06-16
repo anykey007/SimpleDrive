@@ -2,7 +2,27 @@ require "test_helper"
 
 class BlobTest < ActiveSupport::TestCase
   test "valid with user, storage provider, external id, storage key, size and checksum" do
-    assert blobs(:readme_blob).valid?
+    blob = blobs(:readme_blob)
+    assert blob.valid?
+    assert_equal "persisted", blob.status
+  end
+
+  test "defaults status to pending on new record" do
+    blob = Blob.new
+    assert_equal "pending", blob.status
+  end
+
+  test "supports pending, persisted, and failed statuses" do
+    blob = build_blob
+
+    blob.status = "pending"
+    assert blob.status_pending?
+
+    blob.status = "persisted"
+    assert blob.status_persisted?
+
+    blob.status = "failed"
+    assert blob.status_failed?
   end
 
   test "invalid without a user" do

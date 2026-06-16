@@ -26,6 +26,30 @@ module BlobsRequests
         json_response = JSON.parse(response.body)
         assert_includes json_response["error"], "File content is missing on storage server"
       end
+
+      test "GET /v1/blobs/:id returns 404 if blob exists but status is pending" do
+        blob = blobs(:readme_blob)
+        blob.update!(status: :pending)
+
+        get "/v1/blobs/#{blob.external_id}",
+          headers: auth_header(users(:jim))
+
+        assert_response :not_found
+        json_response = JSON.parse(response.body)
+        assert_equal "Blob not found", json_response["error"]
+      end
+
+      test "GET /v1/blobs/:id returns 404 if blob exists but status is failed" do
+        blob = blobs(:readme_blob)
+        blob.update!(status: :failed)
+
+        get "/v1/blobs/#{blob.external_id}",
+          headers: auth_header(users(:jim))
+
+        assert_response :not_found
+        json_response = JSON.parse(response.body)
+        assert_equal "Blob not found", json_response["error"]
+      end
     end
   end
 end

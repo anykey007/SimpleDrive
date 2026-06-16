@@ -5,6 +5,7 @@ readme_blob:
   storage_key: 11111111-1111-4111-8111-111111111111
   size_bytes: 128
   checksum_sha256: 2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824
+  status: persisted
 
 logo_blob:
   user: bob
@@ -13,6 +14,7 @@ logo_blob:
   storage_key: 22222222-2222-4222-8222-222222222222
   size_bytes: 256
   checksum_sha256: 486ea46224d1bb4fb680f34f7c9ad96a8f24ec88be73ea8e5a6c65260e9cb8a7
+  status: persisted
 
 cyberdyne_blob:
   user: sarah
@@ -21,6 +23,7 @@ cyberdyne_blob:
   storage_key: 33333333-3333-4333-8333-333333333333
   size_bytes: 29
   checksum_sha256: d8d56b0959f6b4cc5871f3014a026e83b2ac5b9e29e1b161e5c1fa7425e730433
+  status: persisted
 
 uplink_blob:
   user: uplink_user
@@ -29,3 +32,4 @@ uplink_blob:
   storage_key: 44444444-4444-4444-8444-444444444444
   size_bytes: 16
   checksum_sha256: 486ea46224d1bb4fb680f34f7c9ad96a8f24ec88be73ea8e5a6c65260e9cb8a7
+  status: persisted
