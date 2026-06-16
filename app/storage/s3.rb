@@ -2,10 +2,8 @@ require_dependency Rails.root.join("lib/s3_client").to_s
 
 module Storage
   class S3 < Base
-    def initialize(storage_key:, options: {})
-      super(storage_key: storage_key, options: options)
-      require_options!(:bucket, :access_key_id, :secret_access_key, :endpoint)
-    end
+    required_options :bucket, :access_key_id, :secret_access_key, :endpoint
+    Storage.register :s3, self
 
     def client
       @client ||= S3Client.new(

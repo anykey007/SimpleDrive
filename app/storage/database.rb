@@ -1,5 +1,7 @@
 module Storage
   class Database < Base
+    Storage.register :database, self
+
     def store(io: nil)
       data = if block_given?
                temp_io = StringIO.new

@@ -2,10 +2,8 @@ require "fileutils"
 
 module Storage
   class Filesystem < Base
-    def initialize(storage_key:, options: {})
-      super(storage_key: storage_key, options: options)
-      require_options!(:storage_path)
-    end
+    required_options :storage_path
+    Storage.register :filesystem, self
 
     def store(io: nil)
       FileUtils.mkdir_p(File.dirname(file_path))

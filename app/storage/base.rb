@@ -14,6 +14,25 @@ module Storage
     end
   end
 
+  class << self
+    def register(adapter_type, adapter_class)
+      @adapters ||= {}
+      @adapters[adapter_type.to_s] = adapter_class
+    end
+
+    def adapter_class_for(adapter_type)
+      @adapters ||= {}
+      unless @adapters.key?(adapter_type.to_s)
+        begin
+          Storage.const_get(adapter_type.to_s.camelize)
+        rescue NameError
+          # Autoloading failed or class doesn't exist
+        end
+      end
+      @adapters[adapter_type.to_s] || raise(ArgumentError, "Unknown storage provider adapter type: #{adapter_type}")
+    end
+  end
+
   class Error < StandardError; end
 
   class ReadDataError < Error
@@ -49,10 +68,19 @@ module Storage
   class Base
     attr_reader :storage_key, :options
 
+    class << self
+      def required_options(*keys)
+        @required_options ||= []
+        @required_options.concat(keys.map(&:to_sym)) if keys.any?
+        @required_options
+      end
+    end
+
     def initialize(storage_key:, options: {})
       raise ArgumentError, "storage_key is required" if storage_key.nil?
       @storage_key = storage_key
       @options = (options || {}).with_indifferent_access
+      validate_required_options!
     end
 
     def store(*)
@@ -64,6 +92,17 @@ module Storage
     end
 
     protected
+
+    def validate_required_options!
+      missing_keys = self.class.required_options.select do |key|
+        value = options[key]
+        value.nil? || (value.respond_to?(:empty?) && value.empty?)
+      end
+
+      if missing_keys.any?
+        raise Storage::ConfigurationError.new(self.class.name, missing_keys)
+      end
+    end
 
     def require_options!(*keys)
       missing_keys = keys.select do |key|

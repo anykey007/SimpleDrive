@@ -3,10 +3,8 @@ require "stringio"
 
 module Storage
   class Ftp < Base
-    def initialize(storage_key:, options: {})
-      super(storage_key: storage_key, options: options)
-      require_options!(:host, :port, :username, :password, :root_path)
-    end
+    required_options :host, :port, :username, :password, :root_path
+    Storage.register :ftp, self
 
     def store(io: nil)
       path = file_path

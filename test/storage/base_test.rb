@@ -46,4 +46,40 @@ class Storage::BaseTest < ActiveSupport::TestCase
     assert_equal "Storage::Base", error.adapter_class
     assert_equal "Missing required options: baz, qux for Storage::Base", error.message
   end
+
+  test "required_options registers the keys and validates them on initialize" do
+    # Create a dummy subclass with required_options
+    dummy_class = Class.new(Storage::Base) do
+      required_options :foo, :bar
+    end
+
+    # Missing all required options
+    error = assert_raises(Storage::ConfigurationError) do
+      dummy_class.new(storage_key: "some_key")
+    end
+    assert_equal ["bar", "foo"], error.missing_keys
+
+    # Missing some required options
+    error2 = assert_raises(Storage::ConfigurationError) do
+      dummy_class.new(storage_key: "some_key", options: { foo: "present" })
+    end
+    assert_equal ["bar"], error2.missing_keys
+
+    # All required options present
+    assert_nothing_raised do
+      dummy_class.new(storage_key: "some_key", options: { foo: "present", bar: "present" })
+    end
+  end
+
+  test "Storage register and adapter_class_for dynamic registration" do
+    dummy_class = Class.new(Storage::Base)
+    Storage.register(:dummy, dummy_class)
+
+    assert_equal dummy_class, Storage.adapter_class_for(:dummy)
+    assert_equal dummy_class, Storage.adapter_class_for("dummy")
+
+    assert_raises(ArgumentError) do
+      Storage.adapter_class_for(:non_existent)
+    end
+  end
 end
