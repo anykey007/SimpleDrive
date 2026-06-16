@@ -102,6 +102,26 @@ class BlobTest < ActiveSupport::TestCase
     assert_includes blob.errors[:checksum_sha256], "can't be blank"
   end
 
+  test "invalid with size bytes equal to 1 megabyte" do
+    blob = build_blob(size_bytes: 1.megabyte)
+
+    assert_not blob.valid?
+    assert_includes blob.errors[:size_bytes], "must be less than #{1.megabyte}"
+  end
+
+  test "invalid with size bytes greater than 1 megabyte" do
+    blob = build_blob(size_bytes: 1.megabyte + 1)
+
+    assert_not blob.valid?
+    assert_includes blob.errors[:size_bytes], "must be less than #{1.megabyte}"
+  end
+
+  test "valid with size bytes slightly less than 1 megabyte" do
+    blob = build_blob(size_bytes: 1.megabyte - 1)
+
+    assert blob.valid?
+  end
+
   private
 
   def build_blob(attributes = {})

@@ -52,6 +52,25 @@ module BlobsRequests
           end
         end
       end
+
+      test "POST /v1/blobs returns 422 if size is 1Mb or larger" do
+        large_data = "A" * 1.megabyte
+        large_params = {
+          id: "too_large_file",
+          data: Base64.strict_encode64(large_data)
+        }
+
+        assert_no_difference -> { Blob.count } do
+          post "/v1/blobs",
+            params: large_params,
+            headers: auth_header(users(:jim)),
+            as: :json
+        end
+
+        assert_response :unprocessable_entity
+        json_response = JSON.parse(response.body)
+        assert_includes json_response["errors"].to_s, "Size bytes must be less than 1048576"
+      end
     end
   end
 end
