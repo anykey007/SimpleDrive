@@ -84,7 +84,7 @@ class S3Client
     http = Net::HTTP.new(request_url.host, request_url.port)
     if request_url.scheme == "https"
       http.use_ssl = true
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      http.verify_mode = OpenSSL::SSL::VERIFY_PEER
     end
     http.open_timeout = 5
     http.read_timeout = 10
