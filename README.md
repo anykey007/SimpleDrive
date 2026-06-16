@@ -17,6 +17,13 @@ Each tenant is configured with their own storage provider and associated users w
 
 To spin up the entire application stack (including PostgreSQL, MinIO S3, and vsftpd FTP server), follow these steps:
 
+### 0. Clone the project
+```bash
+git clone git@github.com:anykey007/SimpleDrive.git
+```
+```bash
+cd SimpleDrive
+```
 ### 1. Start the Containers
 Run the following command from the project root:
 ```bash
