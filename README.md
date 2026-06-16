@@ -22,6 +22,11 @@ Run the following command from the project root:
 ```bash
 docker compose up -d
 ```
+if you are using an older version
+```bash
+docker-compose up -d
+```
+I will only use the new version of docker compose in the code examples below.
 
 ### 2. Prepare and Seed the Database
 Initialize the database and load the seed data:
