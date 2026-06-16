@@ -9,7 +9,7 @@ class Storage::FtpTest < ActiveSupport::TestCase
   test "stores and retrieves file content on FTP server" do
     storage = Storage::Ftp.new(
       options: @provider.configuration,
-      storage_key: '11test_ftp_file_key'
+      storage_key: "11test_ftp_file_key"
     )
 
     io = StringIO.new("Hello FTP World!")
@@ -28,7 +28,7 @@ class Storage::FtpTest < ActiveSupport::TestCase
   test "stores and retrieves file content on FTP server using block pattern" do
     storage = Storage::Ftp.new(
       options: @provider.configuration,
-      storage_key: '12test_ftp_file_key'
+      storage_key: "12test_ftp_file_key"
     )
 
     # Verify store with block returns the correct file path
@@ -63,14 +63,14 @@ class Storage::FtpTest < ActiveSupport::TestCase
     assert_raises(Storage::ConfigurationError) do
       Storage::Ftp.new(
         options: @provider.configuration.merge(root_path: nil),
-        storage_key: 'test_ftp_file_key'
+        storage_key: "test_ftp_file_key"
       )
     end
 
     assert_raises(Storage::ConfigurationError) do
       Storage::Ftp.new(
         options: @provider.configuration.except(:root_path),
-        storage_key: 'test_ftp_file_key'
+        storage_key: "test_ftp_file_key"
       )
     end
   end
@@ -79,7 +79,7 @@ class Storage::FtpTest < ActiveSupport::TestCase
     error = assert_raises(Storage::ConfigurationError) do
       Storage::Ftp.new(
         options: {},
-        storage_key: 'test_ftp_file_key'
+        storage_key: "test_ftp_file_key"
       )
     end
     assert_equal [ "host", "password", "port", "root_path", "username" ], error.missing_keys
@@ -99,14 +99,14 @@ class Storage::FtpTest < ActiveSupport::TestCase
   test "raises Storage::WriteDataError when writing fails on FTP store" do
     storage = Storage::Ftp.new(
       options: @provider.configuration,
-      storage_key: 'test_ftp_file_key'
+      storage_key: "test_ftp_file_key"
     )
 
     storage.stub(:with_ftp, ->(*args) { raise Net::FTPTempError, "421 Service not available" }) do
       error = assert_raises(Storage::WriteDataError) do
         storage.store(io: StringIO.new("test"))
       end
-      assert_equal 'test_ftp_file_key', error.storage_key
+      assert_equal "test_ftp_file_key", error.storage_key
       assert_kind_of Net::FTPTempError, error.original_exception
     end
   end

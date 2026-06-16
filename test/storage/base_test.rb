@@ -57,13 +57,13 @@ class Storage::BaseTest < ActiveSupport::TestCase
     error = assert_raises(Storage::ConfigurationError) do
       dummy_class.new(storage_key: "some_key")
     end
-    assert_equal ["bar", "foo"], error.missing_keys
+    assert_equal [ "bar", "foo" ], error.missing_keys
 
     # Missing some required options
     error2 = assert_raises(Storage::ConfigurationError) do
       dummy_class.new(storage_key: "some_key", options: { foo: "present" })
     end
-    assert_equal ["bar"], error2.missing_keys
+    assert_equal [ "bar" ], error2.missing_keys
 
     # All required options present
     assert_nothing_raised do

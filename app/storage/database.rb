@@ -7,9 +7,9 @@ module Storage
                temp_io = StringIO.new
                yield temp_io
                temp_io.string
-             else
+      else
                io.read
-             end
+      end
 
       BlobDataObject.create!(storage_key: storage_key, data: data)
       storage_key
