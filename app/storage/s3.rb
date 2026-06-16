@@ -13,8 +13,7 @@ module Storage
         access_key_id: options[:access_key_id],
         secret_access_key: options[:secret_access_key],
         endpoint: options[:endpoint],
-        region: options[:region],
-        force_path_style: options[:force_path_style].nil? ? true : options[:force_path_style]
+        region: options[:region]
       )
     end
 
