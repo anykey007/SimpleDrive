@@ -8,13 +8,20 @@ module Storage
       require_options!(:host, :port, :username, :password, :root_path)
     end
 
-    def store(io:)
+    def store(io: nil)
       path = file_path
       dir = File.dirname(path)
 
       with_ftp do |ftp|
         mkdir_p(ftp, dir)
-        ftp.storbinary("STOR #{path}", io, Net::FTP::DEFAULT_BLOCKSIZE)
+        if block_given?
+          temp_io = StringIO.new
+          yield temp_io
+          temp_io.rewind
+          ftp.storbinary("STOR #{path}", temp_io, Net::FTP::DEFAULT_BLOCKSIZE)
+        else
+          ftp.storbinary("STOR #{path}", io, Net::FTP::DEFAULT_BLOCKSIZE)
+        end
       end
 
       path

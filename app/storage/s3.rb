@@ -17,8 +17,15 @@ module Storage
       )
     end
 
-    def store(io:)
-      client.put_object(storage_key, io)
+    def store(io: nil)
+      if block_given?
+        temp_io = StringIO.new
+        yield temp_io
+        temp_io.rewind
+        client.put_object(storage_key, temp_io)
+      else
+        client.put_object(storage_key, io)
+      end
       storage_key
     rescue => e
       raise Storage::WriteDataError.new(storage_key, "Failed to write object to S3 bucket", e)

@@ -26,6 +26,16 @@ class Storage::FilesystemTest < ActiveSupport::TestCase
     assert_equal "Hello Simple Storage World!", File.binread(@expected_path)
   end
 
+  test "stores file content using block pattern" do
+    stored_path = @storage.store do |io|
+      io.write("Hello block pattern store!")
+    end
+
+    assert_equal @expected_path, stored_path
+    assert_path_exists @expected_path
+    assert_equal "Hello block pattern store!", File.binread(@expected_path)
+  end
+
   test "stores binary file content" do
     content = "\x00\x01\x02binary".b
 

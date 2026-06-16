@@ -16,6 +16,21 @@ class Storage::DatabaseTest < ActiveSupport::TestCase
     assert_equal "Hello Database Storage World!", db_object.data
   end
 
+  test "stores text file content in database successfully using block pattern" do
+    storage_key = "test-database-key-block"
+    storage = Storage::Database.new(storage_key: storage_key)
+
+    returned_key = storage.store do |io|
+      io.write("Hello Database Storage Block World!")
+    end
+
+    assert_equal storage_key, returned_key
+
+    db_object = BlobDataObject.find_by(storage_key: storage_key)
+    assert_not_nil db_object
+    assert_equal "Hello Database Storage Block World!", db_object.data
+  end
+
   test "stores binary content successfully" do
     storage_key = "test-database-key-binary"
     storage = Storage::Database.new(storage_key: storage_key)

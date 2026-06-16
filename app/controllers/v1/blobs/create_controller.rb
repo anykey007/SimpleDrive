@@ -41,7 +41,7 @@ module V1
 
       def persist_data(blob, data)
         adapter = Storage::Factory.build(blob.storage_provider, storage_key: blob.storage_key)
-        adapter.store(io: Storage.to_io(data))
+        adapter.store { |io| io.write(data) }
 
         blob.status_persisted!
         render json: {

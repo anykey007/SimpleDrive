@@ -39,6 +39,27 @@ class Storage::S3Test < ActiveSupport::TestCase
     retrieved&.close
   end
 
+  test "stores file content to s3 using block pattern" do
+    config = storage_providers(:globex_s3).configuration
+
+    storage = Storage::S3.new(
+      options: config,
+      storage_key: @storage_key
+    )
+
+    # Verify put_object is executed using block pattern
+    result = storage.store do |io|
+      io.write("Hello S3 Block World!")
+    end
+    assert_equal @storage_key, result
+
+    # Retrieves stored file content from s3
+    retrieved = storage.retrieve
+    assert_equal "Hello S3 Block World!", retrieved.read
+  ensure
+    retrieved&.close
+  end
+
   test "raises Storage::ReadDataError when retrieving non-existent file from S3" do
     config = storage_providers(:globex_s3).configuration
 

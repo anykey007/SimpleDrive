@@ -1,7 +1,15 @@
 module Storage
   class Database < Base
-    def store(io:)
-      BlobDataObject.create!(storage_key: storage_key, data: io.read)
+    def store(io: nil)
+      data = if block_given?
+               temp_io = StringIO.new
+               yield temp_io
+               temp_io.string
+             else
+               io.read
+             end
+
+      BlobDataObject.create!(storage_key: storage_key, data: data)
       storage_key
     rescue => e
       raise Storage::WriteDataError.new(storage_key, "Failed to write blob data object to database", e)

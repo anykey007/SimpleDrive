@@ -7,10 +7,16 @@ module Storage
       require_options!(:storage_path)
     end
 
-    def store(io:)
+    def store(io: nil)
       FileUtils.mkdir_p(File.dirname(file_path))
 
-      File.binwrite(file_path, io.read)
+      if block_given?
+        File.open(file_path, "wb") do |file|
+          yield file
+        end
+      else
+        File.binwrite(file_path, io.read)
+      end
 
       file_path
     rescue => e
