@@ -52,6 +52,8 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Install packages
@@ -89,3 +91,8 @@ jobs:
           RAILS_ENV: test
           DATABASE_URL: postgres://postgres:postgres@localhost:5432
         run: bin/rails db:test:prepare test
+
+      - name: Generate Coverage Badge
+        uses: shogo82148/actions-simplecov-badge@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
