@@ -9,7 +9,7 @@ module BlobsRequests
           assert_difference -> { Blob.count }, 1 do
             post "/v1/blobs",
               params: valid_params,
-              headers: auth_header(users(:jim)),
+              headers: auth_header("jim_token"),
               as: :json
           end
 
@@ -39,7 +39,7 @@ module BlobsRequests
             assert_difference -> { Blob.count }, 1 do
               post "/v1/blobs",
                 params: valid_params,
-                headers: auth_header(users(:jim)),
+                headers: auth_header("jim_token"),
                 as: :json
             end
 
@@ -63,7 +63,7 @@ module BlobsRequests
         assert_no_difference -> { Blob.count } do
           post "/v1/blobs",
             params: large_params,
-            headers: auth_header(users(:jim)),
+            headers: auth_header("jim_token"),
             as: :json
         end
 

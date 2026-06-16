@@ -14,7 +14,7 @@ module BlobsRequests
 
       test "GET /v1/blobs/:id retrieves blob from FTP successfully using fixture" do
         get "/v1/blobs/#{@blob.external_id}",
-          headers: auth_header(users(:uplink_user))
+          headers: auth_header("uplink_token")
 
         assert_response :success
         json_response = JSON.parse(response.body)

@@ -8,7 +8,7 @@ module BlobsRequests
         assert_difference -> { Blob.count }, 1 do
           post "/v1/blobs",
             params: valid_params,
-            headers: auth_header(users(:bob)),
+            headers: auth_header("bob_token"),
             as: :json
         end
 

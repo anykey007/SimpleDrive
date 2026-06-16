@@ -10,7 +10,7 @@ module BlobsRequests
         assert_difference -> { Blob.count }, 1 do
           post "/v1/blobs",
             params: valid_params,
-            headers: auth_header(users(:uplink_user)),
+            headers: auth_header("uplink_token"),
             as: :json
         end
 

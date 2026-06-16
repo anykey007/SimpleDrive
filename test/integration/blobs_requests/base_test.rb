@@ -9,7 +9,7 @@ module BlobsRequests
     assert_no_difference -> { Blob.count } do
       post "/v1/blobs",
         params: valid_params,
-        headers: auth_header(users(:jim)),
+        headers: auth_header("jim_token"),
         as: :json
     end
 
@@ -30,7 +30,7 @@ module BlobsRequests
     assert_no_difference -> { Blob.count } do
       post "/v1/blobs",
         params: valid_params,
-        headers: auth_header(users(:jim)),
+        headers: auth_header("jim_token"),
         as: :json
     end
 
@@ -58,7 +58,7 @@ module BlobsRequests
   test "rejects request with invalid base64 data" do
     post "/v1/blobs",
       params: { id: "any_valid_string_or_identifier", data: "not valid base64" },
-      headers: auth_header(users(:jim)),
+      headers: auth_header("jim_token"),
       as: :json
 
     assert_response :unprocessable_entity
@@ -66,7 +66,7 @@ module BlobsRequests
 
   test "GET /v1/blobs/:id returns 404 if blob not found" do
     get "/v1/blobs/non_existent_id",
-      headers: auth_header(users(:jim))
+      headers: auth_header("jim_token")
 
     assert_response :not_found
     json_response = JSON.parse(response.body)
@@ -85,7 +85,7 @@ module BlobsRequests
 
   test "GET /v1/blobs/:id does not allow a user to access other user's blobs" do
     get "/v1/blobs/#{blobs(:cyberdyne_blob).external_id}",
-      headers: auth_header(users(:jim))
+      headers: auth_header("jim_token")
 
     assert_response :not_found
   end

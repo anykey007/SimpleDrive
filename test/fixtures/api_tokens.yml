@@ -2,16 +2,16 @@
 
 jim_token:
   user: jim
-  token_digest: <%= ApiToken.digest("6d4769052b644be4c3f96ee67faa4bbb8ab8aa8be46055f2cea1e513cec22d52") %>
+  token_digest: <%= ApiToken.digest("jim_token") %>
 
 bob_token:
   user: bob
-  token_digest: <%= ApiToken.digest("93367a826d78632eb54957f467e10fa0628213e2c1896fb0c37338f7fb9f4c26") %>
+  token_digest: <%= ApiToken.digest("bob_token") %>
 
 sarah_token:
   user: sarah
-  token_digest: <%= ApiToken.digest("d88214fa3ca59d332d78632eb54957f467e10fa0628213e2c1896fb0c37338ff") %>
+  token_digest: <%= ApiToken.digest("sarah_token") %>
 
 uplink_user_token:
   user: uplink_user
-  token_digest: <%= ApiToken.digest("f44319627c65ed15e80b36a9029a34c3eb3eb57cb2c13defa3fd8acf1b8ef7b4") %>
+  token_digest: <%= ApiToken.digest("uplink_token") %>
