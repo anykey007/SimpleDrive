@@ -14,7 +14,8 @@ module BlobsRequests
             as: :json
         end
 
-        assert_response :no_content
+        assert_response :created
+        assert_json_response(response, valid_params, check_data: false)
 
         blob = Blob.last
         assert_equal valid_params[:id], blob.external_id

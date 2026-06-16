@@ -29,7 +29,11 @@ module V1
         adapter.store(io: StringIO.new(decoded_data))
 
         blob.save!
-        head :no_content
+        render json: {
+          id: blob.external_id,
+          size: blob.size_bytes.to_s,
+          created_at: blob.created_at.utc.iso8601
+        }, status: :created
       else
         render json: { errors: blob.errors.full_messages }, status: :unprocessable_entity
       end

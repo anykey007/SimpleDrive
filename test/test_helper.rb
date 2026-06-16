@@ -31,5 +31,13 @@ module ActiveSupport
         data: Base64.strict_encode64("Hello Simple Storage World!")
       }
     end
+
+    def assert_json_response(response, params, check_data: true)
+      json_response = JSON.decode(response.body)
+      assert_equal params[:id], json_response["id"]
+      assert_match(/\A\d+\z/, json_response["size"])
+      assert_match(/\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z\z/, json_response["created_at"])
+      assert_equal(params[:data], json_response["data"]) if check_data
+    end
   end
 end

@@ -14,11 +14,7 @@ module BlobsRequests
           headers: auth_header(users(:jim))
 
         assert_response :success
-        json_response = JSON.parse(response.body)
-        assert_equal valid_params[:id], json_response["id"]
-        assert_equal valid_params[:data], json_response["data"]
-        assert_equal "27", json_response["size"]
-        assert_match(/\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z\z/, json_response["created_at"])
+        assert_json_response(response, valid_params)
       end
 
       test "GET /v1/blobs/:id returns 404 with custom error if blob exists but storage file is missing" do
