@@ -27,13 +27,8 @@ module V1
       private
 
       def read_data(blob)
-        storage_provider = blob.storage_provider
-        adapter = Storage::Factory.build(storage_provider, storage_key: blob.storage_key)
-
-        io = adapter.retrieve
-        io.read
-      ensure
-        io.close if io.respond_to?(:close)
+        adapter = Storage::Factory.build(blob.storage_provider, storage_key: blob.storage_key)
+        adapter.retrieve { |io| io.read }
       end
     end
   end

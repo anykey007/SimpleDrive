@@ -22,7 +22,7 @@ module Storage
       raise Storage::WriteDataError.new(storage_key, "Failed to write file to FTP server", e)
     end
 
-    def retrieve
+    def retrieve(&block)
       path = file_path
       data = String.new
 
@@ -32,7 +32,7 @@ module Storage
         end
       end
 
-      StringIO.new(data)
+      Storage.to_io(data, &block)
 
     rescue Net::FTPPermError => e
       raise unless e.message.start_with?("550")

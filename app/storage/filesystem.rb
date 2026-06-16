@@ -17,8 +17,12 @@ module Storage
       raise Storage::WriteDataError.new(storage_key, "Failed to write file to local filesystem", e)
     end
 
-    def retrieve
-      File.open(file_path, "rb")
+    def retrieve(&block)
+      if block_given?
+        File.open(file_path, "rb", &block)
+      else
+        File.open(file_path, "rb")
+      end
     rescue Errno::ENOENT => e
       raise Storage::ReadDataError.new(storage_key, "File not found on local filesystem", e)
     end

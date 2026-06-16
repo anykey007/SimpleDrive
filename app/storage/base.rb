@@ -1,4 +1,19 @@
+require "stringio"
+
 module Storage
+  def self.to_io(data)
+    io = StringIO.new(data)
+    if block_given?
+      begin
+        yield io
+      ensure
+        io.close
+      end
+    else
+      io
+    end
+  end
+
   class Error < StandardError; end
 
   class ReadDataError < Error

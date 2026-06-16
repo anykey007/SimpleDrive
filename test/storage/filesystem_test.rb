@@ -44,6 +44,20 @@ class Storage::FilesystemTest < ActiveSupport::TestCase
     retrieved&.close
   end
 
+  test "retrieves stored file using block pattern and closes it automatically" do
+    @storage.store(io: StringIO.new("stored block content"))
+
+    closed = nil
+    result = @storage.retrieve do |io|
+      val = io.read
+      closed = io.closed?
+      val
+    end
+
+    assert_equal "stored block content", result
+    assert_not closed, "expected IO to be open inside block"
+  end
+
   test "raises Storage::ReadDataError when file does not exist on retrieve" do
     @storage = Storage::Filesystem.new(options: { storage_path: @storage_path }, storage_key: "missing-key")
     assert_raises(Storage::ReadDataError) do

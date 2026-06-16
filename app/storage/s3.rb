@@ -24,9 +24,9 @@ module Storage
       raise Storage::WriteDataError.new(storage_key, "Failed to write object to S3 bucket", e)
     end
 
-    def retrieve
+    def retrieve(&block)
       response = client.get_object(storage_key)
-      StringIO.new(response.body)
+      Storage.to_io(response.body, &block)
     rescue => e
       if e.message.include?("code 404")
         raise Storage::ReadDataError.new(storage_key, "Object not found in S3 bucket", e)
