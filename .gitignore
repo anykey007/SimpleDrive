@@ -24,5 +24,4 @@
 # Ignore key files for decrypting credentials and more.
 /config/*.key
 
-docker-compose.yml
 .idea/
