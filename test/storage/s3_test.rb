@@ -23,14 +23,14 @@ class Storage::S3Test < ActiveSupport::TestCase
 
     storage = Storage::S3.new(
       options: config,
-      storage_key: @storage_key
+      storage_key: 'test_1_file_key'
     )
 
     io = StringIO.new("Hello S3 World!")
 
     # Verify bucket check and put_object are executed without error
     result = storage.store(io: io)
-    assert_equal @storage_key, result
+    assert_equal 'test_1_file_key', result
 
     # Retrieves stored file content from s3
     retrieved = storage.retrieve
@@ -44,14 +44,14 @@ class Storage::S3Test < ActiveSupport::TestCase
 
     storage = Storage::S3.new(
       options: config,
-      storage_key: @storage_key
+      storage_key: 'test_2_file_key'
     )
 
     # Verify put_object is executed using block pattern
     result = storage.store do |io|
       io.write("Hello S3 Block World!")
     end
-    assert_equal @storage_key, result
+    assert_equal 'test_2_file_key', result
 
     # Retrieves stored file content from s3
     retrieved = storage.retrieve
