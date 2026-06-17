@@ -17,6 +17,28 @@ module BlobsRequests
         assert_json_response(response, valid_params)
       end
 
+      test "GET /v1/blobs/:id retrieves blob with slashes and special characters in id successfully" do
+        special_id = "documents/2026/archive(final)+draft-v2_approved?\\image.pdf"
+        special_params = {
+          id: special_id,
+          data: Base64.strict_encode64("Hello Slashes and Special Chars!")
+        }
+
+        post "/v1/blobs",
+          params: special_params,
+          headers: auth_header("jim_token"),
+          as: :json
+
+        assert_response :created
+
+        # In URL, ? is %3F, \ is %5C
+        get "/v1/blobs/documents/2026/archive(final)+draft-v2_approved%3F%5Cimage.pdf",
+          headers: auth_header("jim_token")
+
+        assert_response :success
+        assert_json_response(response, special_params)
+      end
+
       test "GET /v1/blobs/:id returns 404 with custom error if blob exists but storage file is missing" do
         # This blob has no real file stored in filesystem
         get "/v1/blobs/#{blobs(:readme_blob).external_id}",

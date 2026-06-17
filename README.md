@@ -163,6 +163,37 @@ curl -X GET http://localhost:3000/v1/blobs/ftp_file_example \
 
 ---
 
+### 5. Wildcard Routing and Special Characters in IDs
+
+#### Example with Complex Path and Special Characters
+- **User**: `john@acme.test` (Acme)
+- **Token**: `e44319627c65ed15e80b36a9029a34c3eb3eb57cb2c13defa3fd8acf1b8ef7b9`
+- **File Path / ID**: `documents/2026/archive(final)+draft-v2_approved?\image.pdf`
+
+##### Store File (POST)
+```bash
+curl -X POST http://localhost:3000/v1/blobs \
+  -H "Authorization: Bearer e44319627c65ed15e80b36a9029a34c3eb3eb57cb2c13defa3fd8acf1b8ef7b9" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": "documents/2026/archive(final)+draft-v2_approved?\\image.pdf",
+    "data": "SGVsbG8gV2lsZGNhcmQgUm91dGluZyE="
+  }'
+```
+
+##### Retrieve File (GET)
+Characters that have structural meaning in URIs or HTTP engines must be URL-encoded:
+- `?` must be URL-encoded as `%3F` so it is not interpreted as the start of a query string.
+- `\` must be URL-encoded as `%5C` so it is processed correctly as a path character.
+
+Here is the curl request with the properly encoded path:
+```bash
+curl -X GET http://localhost:3000/v1/blobs/documents%2F2026%2Farchive%28final%29%2Bdraft-v2_approved%3F%5Cimage.pdf \
+  -H "Authorization: Bearer e44319627c65ed15e80b36a9029a34c3eb3eb57cb2c13defa3fd8acf1b8ef7b9"
+```
+
+---
+
 ## Error Handling Examples
 
 Here are some examples of how the service handles various client errors, complete with expected status codes and response bodies.
