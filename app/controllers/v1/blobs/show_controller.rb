@@ -9,12 +9,7 @@ module V1
         blob = @current_user.blobs.where(status: :persisted).find_by!(external_id: params[:id])
         data = read_data(blob)
 
-        render json: {
-          id: blob.external_id,
-          data: Base64.strict_encode64(data),
-          size: blob.size_bytes.to_s,
-          created_at: blob.created_at.utc.iso8601
-        }, status: :ok
+        render json: BlobShowSerializer.new(blob, data), status: :ok
 
       rescue ActiveRecord::RecordNotFound => e
         render json: { error: "Blob not found" }, status: :not_found

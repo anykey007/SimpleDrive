@@ -8,8 +8,6 @@ module V1
       before_action :authenticate_user!
 
       def create
-        decoded_data = Base64.strict_decode64(params[:data].to_s)
-
         storage_provider = @current_user.default_storage_provider
 
         unless storage_provider
@@ -17,6 +15,7 @@ module V1
           return
         end
 
+        decoded_data = Base64.strict_decode64(params[:data].to_s)
         blob = Blob.new(
           user: @current_user,
           storage_provider: storage_provider,
@@ -28,6 +27,8 @@ module V1
 
         if blob.save
           persist_data(blob, decoded_data)
+          blob.status_persisted!
+          render json: BlobSerializer.new(blob), status: :created
         else
           render json: { errors: blob.errors.full_messages }, status: :unprocessable_entity
         end
@@ -42,13 +43,6 @@ module V1
       def persist_data(blob, data)
         adapter = Storage::Factory.build(blob.storage_provider, storage_key: blob.storage_key)
         adapter.store { |io| io.write(data) }
-
-        blob.status_persisted!
-        render json: {
-          id: blob.external_id,
-          size: blob.size_bytes.to_s,
-          created_at: blob.created_at.utc.iso8601
-        }, status: :created
       rescue => e
         blob.status_failed!
         raise e
