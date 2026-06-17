@@ -58,6 +58,8 @@ module Storage
 
     def with_ftp
       ftp = Net::FTP.new
+      ftp.open_timeout = 5
+      ftp.read_timeout = 10
       ftp.connect(options[:host], options[:port])
       ftp.login(options[:username], options[:password])
       ftp.passive = true
