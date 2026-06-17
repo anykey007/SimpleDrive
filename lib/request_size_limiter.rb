@@ -13,13 +13,13 @@ class RequestSizeLimiter
   end
 
   def call(env)
-    content_length = env['CONTENT_LENGTH'].to_i
+    content_length = env["CONTENT_LENGTH"].to_i
 
     if content_length > max_size
       return [
         413,
-        { 'Content-Type' => 'application/json' },
-        [{ error: 'Payload Too Large', max_allowed_bytes: max_size }.to_json]
+        { "Content-Type" => "application/json" },
+        [ { error: "Payload Too Large", max_allowed_bytes: max_size }.to_json ]
       ]
     end
 
