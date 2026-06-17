@@ -14,6 +14,8 @@ require "action_view/railtie"
 # require "action_cable/engine"
 require "rails/test_unit/railtie"
 
+require_relative "../lib/request_size_limiter"
+
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
@@ -40,5 +42,8 @@ module SimpleDrive
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
+
+    # Request size limiter middleware to protect from oversized payloads
+    config.middleware.use RequestSizeLimiter, max_size: 5 * 1024 * 1024 # 5 MB
   end
 end

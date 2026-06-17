@@ -89,5 +89,22 @@ module BlobsRequests
 
     assert_response :not_found
   end
+
+  test "POST /v1/blobs returns 413 Payload Too Large when request exceeds the limit" do
+    ENV["MAX_REQUEST_SIZE_BYTES"] = "20"
+    begin
+      post "/v1/blobs",
+        params: valid_params,
+        headers: auth_header("jim_token"),
+        as: :json
+
+      assert_response 413
+      json_response = JSON.parse(response.body)
+      assert_equal "Payload Too Large", json_response["error"]
+      assert_equal 20, json_response["max_allowed_bytes"]
+    ensure
+      ENV.delete("MAX_REQUEST_SIZE_BYTES")
+    end
+  end
   end
 end
